@@ -1,0 +1,37 @@
+{
+  "wav_file": "20250914_181159_108_plant_ad8232_chunk_238_789137.wav",
+  "session_id": "1s_lag_collection_20250914_181054",
+  "timestamp": 1757866319.1093912,
+  "precise_timestamp": 1757866319.1093912,
+  "face_timestamp": 1757866318.721417,
+  "time_difference": 0.38797426223754883,
+  "face_emotion_3class": "relaxed",
+  "plant_emotion_3class": null,
+  "face_emotion_raw": "neutral",
+  "face_confidence_raw": 0.9470906257629395,
+  "emotion_mapping_used": {
+    "original": "neutral",
+    "mapped": "relaxed"
+  },
+  "valid_raw_emotions": [
+    "anger",
+    "disgust",
+    "fear",
+    "happiness",
+    "sadness",
+    "surprise",
+    "neutral"
+  ],
+  "valid_3class_emotions": [
+    "positive_activation",
+    "negative_activation",
+    "relaxed"
+  ],
+  "emotion_system": "3-class-1s",
+  "sample_interval": 1.0,
+  "collection_purpose": "raw_training_data",
+  "raw_collection": true,
+  "face_detection_model": "trpakov/vit-face-expression",
+  "plant_prediction": null,
+  "plant_confidence": null
+}
