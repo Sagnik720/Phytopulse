@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #0b1116;
+  color: #e0fbe5;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+/* Navbar */
+.navbar {
+  background: #000; /* solid black background */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid rgba(0, 255, 128, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 15px rgba(0, 255, 128, 0.2);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 45px;
+  filter: drop-shadow(0 0 6px #00ff99);
+}
+
+.logo span {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #00ff99;
+  letter-spacing: 1px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: #e0fbe5;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: #00ff99;
+  text-shadow: 0 0 10px #00ff99;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: url('https://i.ibb.co/SwRfSwLg/two-monastera-leaves-black-background.jpg') center/cover no-repeat;
+}
+
+.hero .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  max-width: 650px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: #00ff99;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 15px #00ff99;
+}
+
+.hero p {
+  margin-bottom: 2rem;
+}
+
+.btn {
+  background: #00ff99;
+  color: #0b1116;
+  padding: 0.8rem 1.8rem;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+  box-shadow: 0 0 15px #00ff99;
+}
+
+.btn:hover {
+  background: #0b1116;
+  color: #00ff99;
+  box-shadow: 0 0 25px #00ff99;
+}
+
+/* General Sections */
+section {
+  padding: 5rem 3rem;
+  text-align: center;
+}
+
+.about, .technology, .benefits, .insights, .cta {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.technology {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.technology .image img {
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #00ff99;
+}
+
+/* Benefits */
+.benefit-grid {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: rgba(0, 255, 128, 0.05);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 255, 128, 0.2);
+  width: 300px;
+  transition: 0.3s;
+  box-shadow: 0 0 8px rgba(0, 255, 128, 0.3);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #00ff99;
+  box-shadow: 0 0 20px #00ff99;
+}
+
+/* Insights */
+.insights img {
+  margin-top: 2rem;
+  width: 100%;
+  border-radius: 15px;
+  opacity: 0.9;
+  box-shadow: 0 0 20px #00ff99;
+}
+
+/* --- CTA Section --- */
+.cta {
+  position: relative;
+  
+  /* --- Your styles (Kept) --- */
+  background: url('https://i.ibb.co/073PFhV/plants1.jpg') center/cover no-repeat;
+  color: #e0fbe5;
+  border-radius: 20px;
+  padding: 5rem 2rem; /* You can adjust this padding as needed */
+
+  /* --- Fix (Added) --- */
+  /* Use Flexbox to center the content wrapper */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden; /* Kept from your original */
+}
+
+.cta .overlay {
+  position: absolute;
+  inset: 0; /* Your style (Kept) */
+  background: rgba(0, 0, 0, 0.6); /* Your style (Kept) */
+  z-index: 1; /* Sits behind the content */
+}
+
+/* --- This is the NEW wrapper from your HTML --- */
+.cta-content {
+  position: relative; /* Sits on top of the overlay */
+  z-index: 2; 
+
+  /* This is the main fix: */
+  display: flex;
+  flex-direction: column; /* Stacks items vertically */
+  align-items: center;   /* Centers them horizontally */
+  gap: 20px;             /* Adds space BETWEEN each item */
+}
+
+/* Remove default margins that cause issues */
+.cta-content h2,
+.cta-content p {
+  margin: 0;
+}
+
+/* Style for the button (from your screenshot) */
+.cta-content .btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: #28a745; /* A guess at the green color */
+  color: #fff;
+  text-decoration: none;
+  border-radius: 30px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.cta-content .btn:hover {
+  background-color: #218838; /* A slightly darker green for hover */
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0, 255, 128, 0.2);
+  color: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .technology {
+    flex-direction: column;
+  }
+
+  .benefit-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+}
