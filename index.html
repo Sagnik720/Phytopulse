@@ -314,7 +314,7 @@ function showPopup(state, message) {
 // ===============================
 async function fetchPlantData() {
   try {
-    const res = await fetch("http://localhost:5000/api/plant-data");
+    const res = await fetch("https://phytopulse.onrender.com/api/plant-data");
     const data = await res.json();
 
     // Update chart
@@ -519,7 +519,7 @@ function speakHindi(msg) {
 // 🧠 Fetch live plant condition
 async function getPlantStatus() {
   try {
-    const res = await fetch("http://localhost:5000/api/plant-data");
+    const res = await fetch("https://phytopulse.onrender.com/api/plant-data");
     const data = await res.json();
 
     if (data.predictedState === "Normal") return "आपका पौधा बिल्कुल ठीक है 🌿";
