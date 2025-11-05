@@ -120,9 +120,9 @@ app.get("/api/plant-data", (req, res) => {
 });
 
 // ===============================
-// 🚀 RUN SERVER
+// 🚀 RUN SERVER (Render Compatible)
 // ===============================
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`✅ PhytoPulse backend streaming real WAV + emotion label data on port ${PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ PhytoPulse backend running on port ${PORT}`);
 });
