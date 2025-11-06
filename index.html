@@ -4,155 +4,293 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PhytoPulse — Plant Emotion Network</title>
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="phytopulse.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
   <style>
-    html { scroll-behavior: smooth; }
-    body { background-color: #000; color: #e0ffe0; font-family: "Poppins", sans-serif; margin: 0; padding: 0; }
-    .fade-section { opacity: 0; transform: translateY(40px); transition: opacity 1.2s ease-out, transform 1.2s ease-out; }
-    .fade-section.visible { opacity: 1; transform: translateY(0); }
-    footer { text-align: center; padding: 25px; background: #000; color: #fff; font-size: 1rem; }
+    body {
+      margin: 0;
+      background: #000;
+      color: #ccffcc;
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: #000;
+      border-bottom: 1px solid #00ff99;
+      box-shadow: 0 0 20px #00ff99;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #00ff99;
+    }
+
+    header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 30px;
+      margin: 0;
+      padding: 0;
+    }
+
+    header nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    header nav ul li a:hover {
+      color: #00ff99;
+    }
+
+    /* 🌿 Hero Section */
+    .hero {
+      position: relative;
+      height: 90vh;
+      background: url('https://i.ibb.co/TffQpbw/hero-bg.jpg') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #e0ffe0;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      padding: 0 20px;
+      animation: fadeInUp 1.6s ease-out;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      color: #00ff99;
+      text-shadow: 0 0 20px #00ff99;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #ccffcc;
+      margin-bottom: 40px;
+    }
+
+    .hero a {
+      background: #00ff99;
+      color: #000;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 0 20px #00ff99;
+      transition: all 0.3s ease;
+    }
+
+    .hero a:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px #00ff99;
+    }
+
+    /* 🌿 Sections */
+    section {
+      padding: 80px 10%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1.2s ease-out;
+    }
+
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h2 {
+      color: #00ff99;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #00ff99;
+    }
+
+    /* 🌿 Technology */
+    #technology {
+      background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center center/cover;
+      color: #fff;
+      position: relative;
+      padding: 120px 40px;
+    }
+
+    #technology::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    #technology div {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    #technology h2 {
+      color: #00ff99;
+      text-shadow: 0 0 20px #00ff99;
+    }
+
+    /* 🌿 Cards */
+    .card {
+      background: #0a1a0a;
+      color: #ccffcc;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ff99;
+      width: 280px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #00ff99;
+    }
+
+    .benefit-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    /* 🌿 Footer */
+    footer {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 1rem;
+      border-top: 1px solid #00ff99;
+    }
+
+    /* ✨ Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 
 <body>
   <!-- Navbar -->
-  <header class="navbar" style="display:flex;justify-content:space-between;align-items:center;padding:20px 60px;background:#000;border-bottom:1px solid #00ff99;box-shadow:0 0 15px #00ff99;">
-    <div class="logo" style="display:flex;align-items:center;gap:10px;">
-      <img src="phytopulse.png" alt="PhytoPulse Logo" style="height:45px;" />
-      <span style="color:#00ff99;font-size:1.8rem;font-weight:700;">PhytoPulse</span>
+  <header>
+    <div class="logo">
+      <img src="phytopulse.png" alt="PhytoPulse Logo" style="height:40px;">
+      PhytoPulse
     </div>
     <nav>
-      <ul style="list-style:none;display:flex;gap:40px;margin:0;padding:0;">
-        <li><a href="#about" style="color:#fff;text-decoration:none;">About</a></li>
-        <li><a href="#model" style="color:#fff;text-decoration:none;">AI Model</a></li>
-        <li><a href="#technology" style="color:#fff;text-decoration:none;">Technology</a></li>
-        <li><a href="#benefits" style="color:#fff;text-decoration:none;">Benefits</a></li>
-        <li><a href="#insights" style="color:#fff;text-decoration:none;">Insights</a></li>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#model">AI Model</a></li>
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#benefits">Benefits</a></li>
+        <li><a href="#insights">Insights</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero" style="
-    position: relative;
-    height: 100vh;
-    background: url('https://i.ibb.co/TffQpbw/hero-bg.jpg') no-repeat center center/cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #e0ffe0;
-    overflow: hidden;
-  ">
-    <div style="
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 0;
-    "></div>
-
-    <div class="hero-content" style="position: relative; z-index: 1; max-width: 800px; padding: 0 20px;">
-      <h1 style="
-        font-size: 4rem;
-        font-weight: 800;
-        color: #00ff99;
-        text-shadow: 0 0 25px #00ff99, 0 0 10px #00cc88;
-        margin-bottom: 20px;
-      ">
-        Giving Plants a Voice
-      </h1>
-
-      <p style="font-size: 1.3rem; line-height: 1.6; color: #ccffcc; margin-bottom: 40px;">
-        Discover how PhytoPulse translates plant bio-signals into insights using AI and neuroscience.
-      </p>
-
-      <a href="#insights" style="
-        background-color: #00ff99;
-        color: #000;
-        padding: 14px 36px;
-        font-weight: 600;
-        border-radius: 35px;
-        text-decoration: none;
-        box-shadow: 0 0 25px #00ff99;
-        font-size: 1.1rem;
-        transition: all 0.3s ease-in-out;
-      " 
-      onmouseover="this.style.boxShadow='0 0 40px #00ff99'; this.style.transform='scale(1.05)'"
-      onmouseout="this.style.boxShadow='0 0 25px #00ff99'; this.style.transform='scale(1)'">
-        🌿 Explore Dashboard
-      </a>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Giving Plants a Voice</h1>
+      <p>Discover how PhytoPulse translates plant bio-signals into insights using AI and neuroscience.</p>
+      <a href="#insights">Explore Dashboard</a>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section id="about" style="padding:80px 15%;text-align:center;">
-    <h2 style="color:#00ff99;">About PhytoPulse</h2>
+  <!-- About -->
+  <section id="about">
+    <h2>About PhytoPulse</h2>
     <p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p>
   </section>
 
-  <!-- Model Section -->
-  <section id="model" style="padding:80px 15%;text-align:center;">
-    <h2 style="color:#00ff99;">AI Model Development</h2>
+  <!-- Model -->
+  <section id="model">
+    <h2>AI Model Development</h2>
     <p>The collected plant bio-signal data trains our machine learning model to detect plant stress early.</p>
   </section>
 
-  <!-- Technology Section -->
-  <section id="technology" style="
-    position: relative;
-    background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center center/cover;
-    color: #fff;
-    text-align: center;
-    padding: 120px 40px;
-  ">
-    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:0;"></div>
-    <div style="position:relative;z-index:1;max-width:800px;margin:0 auto;">
-      <h2 style="color:#ffffff;">How It Works</h2>
-      <p>Our AI-driven sensors capture real-time electrical patterns from plants to detect stress and emotions early.</p>
+  <!-- Technology -->
+  <section id="technology">
+    <div>
+      <h2>How It Works</h2>
+      <p>AI-driven sensors capture real-time electrical patterns from plants, revealing stress or emotions before visible signs.</p>
     </div>
   </section>
 
   <!-- Benefits -->
-  <section id="benefits" style="padding:80px 10%;text-align:center;">
-    <h2 style="color:#00ff99;">Why PhytoPulse?</h2>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:30px;margin-top:40px;">
-      <div class="card" style="background:#0a1a0a;padding:25px;border-radius:15px;box-shadow:0 0 15px #00ff99;width:280px;">
-        <h3>Early Detection</h3><p>Predict stress before visible damage.</p>
-      </div>
-      <div class="card" style="background:#0a1a0a;padding:25px;border-radius:15px;box-shadow:0 0 15px #00ff99;width:280px;">
-        <h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p>
-      </div>
-      <div class="card" style="background:#0a1a0a;padding:25px;border-radius:15px;box-shadow:0 0 15px #00ff99;width:280px;">
-        <h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p>
-      </div>
+  <section id="benefits">
+    <h2>Why PhytoPulse?</h2>
+    <div class="benefit-grid">
+      <div class="card"><h3>Early Detection</h3><p>Predict stress before visible damage.</p></div>
+      <div class="card"><h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p></div>
+      <div class="card"><h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p></div>
     </div>
   </section>
 
   <!-- Insights -->
-  <section id="insights" style="padding:100px 10%;text-align:center;">
-    <h2 style="color:#00ff99;">Live Plant Communication Dashboard</h2>
-    <div style="width:80%;max-width:700px;margin:50px auto;text-align:center;">
-      <h3 style="color:#00ff99;">📊 Real-Time Plant Signal Graph</h3>
-      <canvas id="plantChart" width="700" height="350" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
-    </div>
-    <div id="plant-data" style="margin:40px;color:#00ff99;"></div>
+  <section id="insights">
+    <h2>Live Plant Communication Dashboard</h2>
+    <canvas id="plantChart" width="700" height="350" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
+    <div id="plant-data" style="margin-top:30px;color:#00ff99;"></div>
   </section>
 
   <!-- Simulated Chart -->
-  <section style="text-align:center;padding-bottom:100px;">
-    <h2 style="color:#00ff99;">🌿 Simulated Plant Signal Patterns</h2>
+  <section>
+    <h2>🌿 Simulated Plant Signal Patterns</h2>
     <canvas id="pythonSimChart" width="800" height="400" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
   </section>
 
   <!-- Footer -->
-  <footer>
-    <p>© 2025 PhytoPulse</p>
-  </footer>
+  <footer>© 2025 PhytoPulse</footer>
 
   <script>
+    // Fade-in scroll observer
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+
+    // Live Data Fetch
     const API_URL = window.location.hostname.includes("localhost")
       ? "http://localhost:5000/api/plant-data"
       : "https://phytopulse-org.onrender.com/api/plant-data";
@@ -175,13 +313,12 @@
         signalData.push(data.signalStrength);
         chart.update();
         document.getElementById("plant-data").innerHTML = `
-          <h3>🌿 PhytoPulse Live Plant Data</h3>
+          <h3>🌿 Live Plant Data</h3>
           <p><strong>Moisture:</strong> ${data.moisture}%</p>
           <p><strong>Temperature:</strong> ${data.temperature}°C</p>
-          <p><strong>Signal Strength:</strong> ${data.signalStrength} V</p>
+          <p><strong>Signal:</strong> ${data.signalStrength} V</p>
           <p><strong>Emotion:</strong> ${data.emotion}</p>
-          <p><strong>Health:</strong> ${data.healthStatus}</p>
-          <p><em>Updated: ${data.timestamp}</em></p>`;
+          <p><em>${data.timestamp}</em></p>`;
       } catch (e) { console.error(e); }
     }
 
@@ -190,20 +327,20 @@
 
     // Simulated Chart
     const ctx2 = document.getElementById('pythonSimChart').getContext('2d');
-    const plantStates = ['Normal','Heat Stress','Drought Stress','Pest Attack'];
-    function simulatePlantSignal(state){
+    const states = ['Normal','Heat Stress','Drought Stress','Pest Attack'];
+    function simulate(state){
       let base=Array.from({length:100},()=>Math.random()*0.5);
       if(state==='Heat Stress') base=base.map((v,i)=>v+Math.sin(i/10)*0.8);
       if(state==='Drought Stress') base=base.map(v=>v+Math.random()*0.4+0.8);
       if(state==='Pest Attack') base=base.map(v=>v+(Math.random()>0.9?0.8:0));
       return base;
     }
-    const simData=plantStates.map(s=>({label:s,data:simulatePlantSignal(s),
+    const simData=states.map(s=>({label:s,data:simulate(s),
       borderColor:s==='Normal'?'#00ff99':s==='Heat Stress'?'#ff5555':s==='Drought Stress'?'#ffaa00':'#8888ff',borderWidth:2,fill:false,tension:0.3}));
     new Chart(ctx2,{type:'line',data:{labels:Array.from({length:100},(_,i)=>`s${i}`),datasets:simData},
       options:{plugins:{legend:{labels:{color:'#00ff99'}},title:{display:true,text:'Simulated Electrical Signal Activity',color:'#00ff99'}},
       scales:{x:{ticks:{color:'#ccffcc'}},y:{min:-1,max:3,ticks:{color:'#ccffcc'}}}}});
-    setInterval(()=>{simData.forEach(d=>d.data=simulatePlantSignal(d.label));Chart.getChart(ctx2)?.update();},5000);
+    setInterval(()=>{simData.forEach(d=>d.data=simulate(d.label));Chart.getChart(ctx2)?.update();},5000);
   </script>
 </body>
 </html>
