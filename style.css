@@ -287,5 +287,39 @@ footer {
   .hero h1 {
     font-size: 2.2rem;
   }
+  /* === Insights Section Fix === */
+.insights {
+  position: relative;
+  margin-top: 2rem;
+  padding: 4rem 2rem;
 }
+
+.insights h2 {
+  color: #00ff99;
+  text-shadow: 0 0 15px #00ff99;
+  margin-bottom: 1.5rem;
+}
+
+canvas#plantChart {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  height: 400px;
+  min-height: 320px;
+  margin: 0 auto;
+  border-radius: 15px;
+  background: rgba(0, 255, 153, 0.05);
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.15);
+}
+
+#plant-data {
+  margin-top: 1rem;
+  text-align: center;
+  color: #aaffcc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+}
+
 
