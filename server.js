@@ -11,18 +11,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Folder paths (Render-safe)
+// ===============================
+// ✅ Folder paths for real plant data (Render-compatible)
+// ===============================
 const WAV_DIR = path.join(__dirname, "data", "wav_files");
 const LABEL_DIR = path.join(__dirname, "data", "json_labels");
 
-// ===============================
-// 🧠 Safe data loading (handles missing folders)
-// ===============================
 let wavFiles = [];
+let currentData = [];
 let fileIndex = 0;
 let sampleIndex = 0;
-let currentData = [];
 
+// Try to load real data if available
 try {
   if (fs.existsSync(WAV_DIR)) {
     wavFiles = fs.readdirSync(WAV_DIR).filter(f => f.endsWith(".wav"));
@@ -33,10 +33,10 @@ try {
       console.warn("⚠️ No WAV files found — using simulated data.");
     }
   } else {
-    console.warn("⚠️ Data folder not found — using simulated data.");
+    console.warn("⚠️ Data folders not found — using simulated data.");
   }
 } catch (err) {
-  console.warn("⚠️ Error reading WAV files — using simulated data.", err);
+  console.warn("⚠️ Error reading WAV data — using simulated data.", err);
 }
 
 // ===============================
@@ -46,7 +46,8 @@ function readWavData(filePath) {
   const buffer = fs.readFileSync(filePath);
   const decoded = wav.decode.sync(buffer);
   const samples = decoded.channelData[0];
-  return samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
+  const voltages = samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
+  return voltages;
 }
 
 function getMatchingLabel(wavFileName) {
@@ -64,11 +65,11 @@ function getMatchingLabel(wavFileName) {
 }
 
 // ===============================
-// 🌾 Generate Live-like Packets
+// 🌾 Generate live-like packets
 // ===============================
 function getNextPlantData() {
+  // 🌿 Fallback if no real data is found
   if (currentData.length === 0) {
-    // Simulated fallback data (for Render safety)
     return {
       plantId: "PP-SIM-001",
       signalStrength: (Math.random() * 5).toFixed(2),
@@ -98,6 +99,7 @@ function getNextPlantData() {
   const avgVoltage = chunk.reduce((a, b) => a + b, 0) / chunk.length;
   const moisture = Math.min(100, Math.max(10, avgVoltage * 20 + Math.random() * 10));
   const temperature = (20 + Math.random() * 10).toFixed(1);
+
   const emotionLabel = getMatchingLabel(wavFiles[fileIndex]);
 
   let predictedState = "Normal";
@@ -150,9 +152,18 @@ app.get("/api/plant-data", (req, res) => {
 });
 
 // ===============================
+// 🌐 Serve Frontend Files
+// ===============================
+app.use(express.static(__dirname)); // Serve all static files (index.html, css, etc.)
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// ===============================
 // 🚀 RUN SERVER (Render Compatible)
 // ===============================
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ PhytoPulse backend running on port ${PORT}`);
 });
