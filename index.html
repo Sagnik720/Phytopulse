@@ -1,49 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="style.css" />
-
-<style>
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Fade-in animation */
-  .fade-section {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 1.2s ease-out, transform 1.2s ease-out;
-  }
-
-  .fade-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-
-<script>
-  // Wait until the DOM is ready
-  document.addEventListener("DOMContentLoaded", () => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-  entry.target.classList.add("visible");
-} else {
-  entry.target.classList.remove("visible"); // allow re-animation on scroll up
-}
-
-      });
-    }, { threshold: 0.2 });
-
-    // Apply fade animation to all main sections
-    document.querySelectorAll("section, .benefit-grid, .card, .hero-content").forEach(el => {
-      el.classList.add("fade-section");
-      observer.observe(el);
-    });
-  });
-</script>
-
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PhytoPulse — Plant Emotion Network</title>
@@ -51,9 +8,30 @@
   <link rel="icon" type="image/png" href="phytopulse.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-</head>
-<body>
 
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #000; color: #e0ffe0; font-family: "Poppins", sans-serif; }
+    .fade-section { opacity: 0; transform: translateY(40px); transition: opacity 1.2s ease-out, transform 1.2s ease-out; }
+    .fade-section.visible { opacity: 1; transform: translateY(0); }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add("visible");
+          else entry.target.classList.remove("visible");
+        });
+      }, { threshold: 0.2 });
+
+      document.querySelectorAll("section, .benefit-grid, .card, .hero-content")
+        .forEach(el => { el.classList.add("fade-section"); observer.observe(el); });
+    });
+  </script>
+</head>
+
+<body>
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
@@ -71,7 +49,7 @@
     </nav>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero">
     <div class="overlay"></div>
     <div class="hero-content">
@@ -81,532 +59,166 @@
     </div>
   </section>
 
-  <!-- About Section -->
+  <!-- About -->
   <section id="about" class="about">
     <h2>About PhytoPulse</h2>
-    <p>
-      PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication. 
-      Our bioelectrode patches detect subtle plant signals — revealing stress, emotion, and adaptation long before visible symptoms appear.
-    </p>
+    <p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p>
   </section>
 
-  <!-- AI Model Development Section -->
+  <!-- AI Model -->
   <section id="model" class="model-section">
     <h2>AI Model Development</h2>
-    <p>
-      The collected plant bio-signal data is used to train a machine learning model — 
-      the intelligent "brain" of PhytoPulse. This model learns to recognize the unique 
-      electrical fingerprint of each stressor, such as heat, drought, or pest attacks.
-    </p>
-    <p>
-      Inspired by neuroscience and EEG signal processing, our system interprets 
-      microvolt-level plant responses to detect stress long before visible symptoms appear.
-    </p>
-    <p>
-      <strong>Validation:</strong> Each trained model is rigorously tested on unseen data 
-      to ensure high predictive accuracy, sensitivity, and specificity — delivering 
-      reliable early alerts to farmers and researchers.
-    </p>
+    <p>The collected plant bio-signal data trains our machine learning model to detect plant stress early.</p>
   </section>
 
-  <!-- Technology Section -->
-<section id="technology" class="technology" 
-  style="
+  <!-- Technology -->
+  <section id="technology" style="
     position: relative;
     background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center center/cover;
-    color: #fff;
-    text-align: center;
-    padding: 120px 40px;
-    overflow: hidden;
-  ">
-  
-  <!-- Overlay for better readability -->
-  <div style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 0;
-  "></div>
+    color: #fff; text-align: center; padding: 120px 40px; overflow: hidden;">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:0;"></div>
+    <div style="position:relative;z-index:1;max-width:800px;margin:0 auto;">
+      <h2 style="color:#00ff99;">How It Works</h2>
+      <p>AI-driven sensors capture electrical signals from plants, revealing stress or emotions before visible signs.</p>
+    </div>
+  </section>
 
-  <!-- Text Content -->
-  <div style="
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: 'Poppins', sans-serif;
-  ">
-    <h2 style="color:#00ff99; font-size:2.2em; margin-bottom:20px;">
-      How It Works
-    </h2>
-    <p style="color:#e0ffe0; font-size:1.1em; line-height:1.6;">
-      Our AI-driven sensors capture real-time electrical patterns from plants. 
-      These bio-signals are analyzed to identify conditions such as heat stress, drought, pest attacks, 
-      and nutrient deficiencies — days before they are visible.
-    </p>
-  </div>
-</section>
-
-
-  <!-- Benefits Section -->
-  <section id="benefits" class="benefits">
+  <!-- Benefits -->
+  <section id="benefits">
     <h2>Why PhytoPulse?</h2>
     <div class="benefit-grid">
-      <div class="card">
-        <h3>Early Detection</h3>
-        <p>Predict stress days before symptoms appear — preventing 30–60% yield loss.</p>
-      </div>
-      <div class="card">
-        <h3>Eco-Friendly</h3>
-        <p>Completely non-invasive and sustainable sensing system for all crops.</p>
-      </div>
-      <div class="card">
-        <h3>Smart Insights</h3>
-        <p>Farmers receive real-time updates and adaptive recommendations.</p>
-      </div>
+      <div class="card"><h3>Early Detection</h3><p>Predict stress before visible damage.</p></div>
+      <div class="card"><h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p></div>
+      <div class="card"><h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p></div>
     </div>
   </section>
 
-  <!-- Insights Section -->
-  <section id="insights" class="insights">
+  <!-- Insights -->
+  <section id="insights">
     <h2>Live Plant Communication Dashboard</h2>
-    <p>Visualize live data patterns and AI analysis as plants respond to their environment.</p>
-
     <div style="width:80%;max-width:700px;margin:50px auto;text-align:center;">
       <h3 style="color:#00ff99;">📊 Real-Time Plant Signal Graph</h3>
-      <canvas id="plantChart" width="700" height="350" 
-              style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
+      <canvas id="plantChart" width="700" height="350" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
     </div>
-
-    <div id="plant-data" style="margin:40px;color:#00ff99;font-family:Poppins;"></div>
+    <div id="plant-data" style="margin:40px;color:#00ff99;"></div>
   </section>
 
-  <!-- 🌿 Simulated Signal Patterns -->
-  <div style="width:85%;max-width:900px;margin:60px auto;text-align:center;">
-    <h2 style="color:#00ff99;">🌿 Simulated Plant Signal Patterns</h2>
-    <canvas id="pythonSimChart" width="800" height="400"
-            style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
-  </div>
-
-  <!-- 🌾 Smart Farmer Alert (Hindi Voice) -->
-  <div id="alertPopup" style="
-    display:none; position:fixed; bottom:30px; right:30px;
-    background:rgba(0,0,0,0.85); border-left:6px solid #00ff99;
-    padding:20px 25px; color:#fff; font-family:Poppins,sans-serif;
-    font-size:16px; border-radius:12px; box-shadow:0 0 20px #00ff99;
-    z-index:9999; max-width:360px;">
-    <strong id="alertTitle">🌿 पौधों की चेतावनी</strong>
-    <p id="alertMessage" style="margin:10px 0;"></p>
-    <button id="alertAction" style="
-      background:#00ff99;color:#000;font-weight:bold;
-      border:none;border-radius:8px;padding:8px 14px;
-      margin-top:10px;cursor:pointer;">कार्रवाई करें</button>
-  </div>
-
-  <style>
-  @keyframes fadeIn { from {opacity:0;transform:translateY(20px);} to {opacity:1;transform:translateY(0);} }
-  @keyframes fadeOut { from {opacity:1;transform:translateY(0);} to {opacity:0;transform:translateY(20px);} }
-  </style>
-
+  <!-- JS: Live Data -->
   <script>
-  // Load TensorFlow.js model
-  let model;
-async function loadModel() {
-  try {
-    model = await tf.loadLayersModel('tfjs_model/model.json');
-    console.log("✅ AI Model Loaded");
-  } catch (error) {
-    console.error("❌ Error loading model:", error);
-  }
-}
-loadModel();
+    const API_URL = window.location.hostname.includes("localhost")
+      ? "http://localhost:5000/api/plant-data"
+      : "https://phytopulse-org.onrender.com/api/plant-data";
 
-// ===============================
-// 📈 Live Chart Setup
-// ===============================
-const ctx = document.getElementById('plantChart').getContext('2d');
-const timeLabels = [];
-const signalData = [];
-const chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: timeLabels,
-    datasets: [{
-      label: 'Signal Strength (V)',
-      data: signalData,
-      borderColor: '#00ff99',
-      backgroundColor: 'rgba(0,255,153,0.2)',
-      fill: true,
-      tension: 0.3,
-      pointRadius: 2
-    }]
-  },
-  options: {
-    scales: {
-      x: { title: { display: true, text: 'Time', color: '#00ff99' }, ticks: { color: '#ccffcc' } },
-      y: { title: { display: true, text: 'Signal Voltage (V)', color: '#00ff99' }, ticks: { color: '#ccffcc' }, min: 0, max: 5 }
-    },
-    plugins: { legend: { labels: { color: '#00ff99' } } }
-  }
-});
-
-// ===============================
-// 🎙️ Hindi Voice Function
-// ===============================
-function speakHindi(msg) {
-  const u = new SpeechSynthesisUtterance(msg);
-  u.lang = "hi-IN";
-  u.rate = 1;
-  speechSynthesis.speak(u);
-}
-
-// ===============================
-// ⚙️ Alert System + Cooldown Logic
-// ===============================
-let lastAlert = "";
-let cooldown = 60; // 60 seconds cooldown (1 minute)
-let stableState = "Normal";
-
-function getActionForState(state) {
-  switch (state) {
-    case "Drought Stress": return { color:"#ffaa00", action:"💧 सिंचाई चालू करें", voice:"आपके पौधे प्यासे हैं, कृपया पानी दें।" };
-    case "Pest Attack": return { color:"#ff5555", action:"🐛 कीट नियंत्रण करें", voice:"चेतावनी! कीट हमले की संभावना है।" };
-    case "Heat Stress": return { color:"#ff8800", action:"🌞 छाया प्रदान करें", voice:"पौधा गर्मी से परेशान है।" };
-    case "Nutrient Deficiency": return { color:"#66ccff", action:"🌱 उर्वरक डालें", voice:"पौधों में पोषक तत्वों की कमी है।" };
-    case "Overwatering": return { color:"#00ccff", action:"💧 पानी कम करें", voice:"अधिक पानी देने से बचें।" };
-    default: return { color:"#00ff99", action:"🌿 पौधा स्वस्थ है", voice:"आपका पौधा स्वस्थ और खुश है।" };
-  }
-}
-
-// Popup Display
-function showPopup(state, message) {
-  const popup = document.getElementById("alertPopup");
-  const title = document.getElementById("alertTitle");
-  const msg = document.getElementById("alertMessage");
-  const button = document.getElementById("alertAction");
-
-  const { color, action, voice } = getActionForState(state);
-  popup.style.borderLeft = `6px solid ${color}`;
-  title.innerHTML = `🚨 ${state} चेतावनी`;
-  msg.innerHTML = message + "<br><strong>सुझाव:</strong> " + action;
-  button.innerHTML = action;
-  popup.style.display = "block";
-  popup.style.animation = "fadeIn 0.5s ease-in-out";
-  speakHindi(voice);
-
-  button.onclick = () => {
-    speakHindi(`कार्रवाई की गई: ${action}`);
-    popup.style.animation = "fadeOut 0.5s ease-in-out";
-    setTimeout(() => popup.style.display = "none", 500);
-  };
-
-  setTimeout(() => {
-    popup.style.animation = "fadeOut 0.5s ease-in-out";
-    setTimeout(() => popup.style.display = "none", 500);
-  }, 8000);
-}
-
-// ===============================
-// 🧠 Fetch + Stability System
-// ===============================
-async function fetchPlantData() {
-  try {
-    const res = await fetch("https://phytopulse-org.onrender.com/api/plant-data
-");
-    const data = await res.json();
-
-    // Update chart
-    const now = new Date().toLocaleTimeString();
-    if (timeLabels.length > 20) { timeLabels.shift(); signalData.shift(); }
-    timeLabels.push(now);
-    signalData.push(data.signalStrength);
-    chart.update();
-
-    // Update text data
-    document.getElementById("plant-data").innerHTML = `
-      <h3>🌿 PhytoPulse Live Plant Data</h3>
-      <p><strong>Moisture:</strong> ${data.moisture}%</p>
-      <p><strong>Temperature:</strong> ${data.temperature}°C</p>
-      <p><strong>Signal Strength:</strong> ${data.signalStrength} V</p>
-      <p><strong>Emotion:</strong> ${data.emotion}</p>
-      <p><strong>Signal State:</strong> ${data.signalState}</p>
-      <p><strong>Health Status:</strong> ${data.healthStatus}</p>
-      <p><strong>AI Prediction:</strong> ${data.predictedState}</p>
-      <p><em>Last Updated: ${data.timestamp}</em></p>
-      <p id="cooldown-display" style="color:#66ffcc;">⏳ अगली स्थिति जांच ${cooldown} सेकंड में...</p>
-    `;
-
-    // Only trigger alert when cooldown expires
-    if (cooldown <= 0 && data.alertMessage !== lastAlert) {
-      stableState = data.predictedState;
-      showPopup(stableState, data.alertMessage);
-      lastAlert = data.alertMessage;
-      cooldown = 60; // reset timer
-    }
-
-  } catch (e) {
-    console.error("Error fetching:", e);
-  }
-}
-
-// ===============================
-// ⏳ Cooldown Countdown
-// ===============================
-setInterval(() => {
-  if (cooldown > 0) cooldown--;
-  const el = document.getElementById("cooldown-display");
-  if (el) {
-    el.textContent = cooldown > 0
-      ? `⏳ अगली स्थिति जांच ${cooldown} सेकंड में...`
-      : "✅ नई स्थिति जांच के लिए तैयार है!";
-  }
-}, 1000);
-
-// Refresh plant data every 5 seconds
-setInterval(fetchPlantData, 5000);
-fetchPlantData();
-  </script>
-
-  <footer>
-    <p>© 2025 PhytoPulse </p>
-  </footer>
-<!-- 🌿 Simulated Python-like Dataset Visualization -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const plantStates = ['Normal', 'Heat Stress', 'Drought Stress', 'Pest Attack'];
-
-  // Generate random signal pattern for each state
-  function simulatePlantSignal(state) {
-    let baseSignal = Array.from({ length: 100 }, () => Math.random() * 0.5);
-
-    if (state === 'Heat Stress') {
-      baseSignal = baseSignal.map((v, i) => v + Math.sin(i / 10) * 0.8);
-    } else if (state === 'Drought Stress') {
-      baseSignal = baseSignal.map(v => v + Math.random() * 0.4 + 0.8);
-    } else if (state === 'Pest Attack') {
-      baseSignal = baseSignal.map(v => v + (Math.random() > 0.9 ? 0.8 : 0));
-    }
-
-    return baseSignal;
-  }
-
-  // Generate dataset for all states
-  const simulatedData = plantStates.map(state => ({
-    label: state,
-    data: simulatePlantSignal(state),
-    borderColor:
-      state === 'Normal' ? '#00ff99' :
-      state === 'Heat Stress' ? '#ff5555' :
-      state === 'Drought Stress' ? '#ffaa00' :
-      '#8888ff',
-    borderWidth: 2,
-    fill: false,
-    tension: 0.3
-  }));
-
-  // X-axis labels (s0...s99)
-  const xLabels = Array.from({ length: 100 }, (_, i) => `s${i}`);
-  const ctx2 = document.getElementById('pythonSimChart').getContext('2d');
-
-  // Create Chart
-  new Chart(ctx2, {
-    type: 'line',
-    data: { labels: xLabels, datasets: simulatedData },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { labels: { color: '#00ff99' } },
-        title: {
-          display: true,
-          text: 'Simulated Electrical Signal Activity',
-          color: '#00ff99'
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#ccffcc' },
-          title: { display: true, text: 'Signal Index', color: '#00ff99' }
+    const ctx = document.getElementById('plantChart').getContext('2d');
+    const timeLabels = [];
+    const signalData = [];
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: timeLabels, datasets: [{ label: 'Signal Strength (V)', data: signalData, borderColor: '#00ff99', backgroundColor: 'rgba(0,255,153,0.2)', fill: true, tension: 0.3, pointRadius: 2 }] },
+      options: {
+        scales: {
+          x: { title: { display: true, text: 'Time', color: '#00ff99' }, ticks: { color: '#ccffcc' } },
+          y: { title: { display: true, text: 'Signal Voltage (V)', color: '#00ff99' }, ticks: { color: '#ccffcc' }, min: 0, max: 5 }
         },
-        y: {
-          ticks: { color: '#ccffcc' },
-          title: { display: true, text: 'Voltage (V)', color: '#00ff99' },
-          min: -1,
-          max: 3
-        }
+        plugins: { legend: { labels: { color: '#00ff99' } } }
+      }
+    });
+
+    let cooldown = 60;
+    let lastAlert = "";
+
+    async function fetchPlantData() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        const now = new Date().toLocaleTimeString();
+        if (timeLabels.length > 20) { timeLabels.shift(); signalData.shift(); }
+        timeLabels.push(now);
+        signalData.push(data.signalStrength);
+        chart.update();
+
+        document.getElementById("plant-data").innerHTML = `
+          <h3>🌿 PhytoPulse Live Plant Data</h3>
+          <p><strong>Moisture:</strong> ${data.moisture}%</p>
+          <p><strong>Temperature:</strong> ${data.temperature}°C</p>
+          <p><strong>Signal Strength:</strong> ${data.signalStrength} V</p>
+          <p><strong>Emotion:</strong> ${data.emotion}</p>
+          <p><strong>Health:</strong> ${data.healthStatus}</p>
+          <p><em>Updated: ${data.timestamp}</em></p>`;
+      } catch (e) {
+        console.error("Error fetching data:", e);
       }
     }
-  });
 
-  // Optional — refresh simulation every 5 seconds dynamically
-  setInterval(() => {
-    simulatedData.forEach(d => (d.data = simulatePlantSignal(d.label)));
-    Chart.getChart(ctx2)?.update();
-  }, 5000);
-});
-</script>
+    setInterval(fetchPlantData, 5000);
+    fetchPlantData();
+  </script>
 
-<script>
-document.querySelector('a[href="#insights"]').addEventListener('click', (e) => {
-  e.preventDefault();
-  const dashboard = document.querySelector('#insights');
-  dashboard.scrollIntoView({ behavior: 'smooth' });
-  setTimeout(() => {
-    dashboard.style.boxShadow = '0 0 40px 10px #00ff99';
-    setTimeout(() => (dashboard.style.boxShadow = ''), 1500);
-  }, 1000);
-});
-</script>
+  <footer><p>© 2025 PhytoPulse</p></footer>
 
-<!-- 🌾 Farmer Chatbot (Hindi + English, Minimized Bubble) -->
-<div id="chatbot" style="
-  position: fixed;
-  bottom: -400px;
-  left: 20px;
-  background: rgba(0,0,0,0.9);
-  color: white;
-  padding: 15px;
-  border-radius: 15px;
-  width: 320px;
-  font-family: Poppins, sans-serif;
-  box-shadow: 0 0 15px #00ff99;
-  z-index: 9999;
-  transition: bottom 0.8s ease-in-out;
-">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <strong>🤖 PhytoPulse सहायक</strong>
-    <button id="minimize-btn" style="
-      background:none;border:none;color:#00ff99;font-size:18px;cursor:pointer;">−</button>
+  <!-- Chatbot -->
+  <div id="chatbot" style="
+    position:fixed;bottom:-400px;left:20px;width:320px;
+    background:rgba(0,0,0,0.9);color:white;padding:15px;border-radius:15px;
+    font-family:Poppins,sans-serif;box-shadow:0 0 15px #00ff99;
+    transition:bottom 0.8s ease-in-out;z-index:9999;">
+    <div style="display:flex;justify-content:space-between;">
+      <strong>🤖 PhytoPulse सहायक</strong>
+      <button id="minimize-btn" style="background:none;border:none;color:#00ff99;cursor:pointer;">−</button>
+    </div>
+    <div id="chat-log" style="max-height:200px;overflow-y:auto;margin:10px 0;font-size:14px;"></div>
+    <input id="chat-input" type="text" placeholder="Type in English or Hindi..." style="width:100%;padding:8px;border-radius:8px;border:none;">
+    <button id="chat-send" style="background:#00ff99;border:none;color:#000;padding:6px 10px;margin-top:8px;border-radius:6px;cursor:pointer;">Send</button>
   </div>
-  <div id="chat-log" style="max-height: 200px; overflow-y: auto; margin:10px 0; font-size: 14px;"></div>
-  <input id="chat-input" type="text" placeholder="Type in English or Hindi..." 
-    style="width: 100%; padding: 8px; border-radius: 8px; border: none; outline: none; font-size: 14px;">
-  <div style="margin-top:8px; display:flex; justify-content:space-between;">
-    <button id="chat-send" style="background:#00ff99; border:none; color:#000; padding:6px 10px; border-radius:6px; cursor:pointer;">
-      Send
-    </button>
-    <button id="chat-voice" style="background:#66ccff; border:none; color:#000; padding:6px 10px; border-radius:6px; cursor:pointer;">
-      🎤 Speak
-    </button>
-  </div>
-</div>
 
-<!-- 🌱 Floating Chat Bubble -->
-<div id="chat-bubble" style="
-  display:none;
-  position:fixed;
-  bottom:20px;
-  left:20px;
-  background:#00ff99;
-  color:black;
-  padding:10px 14px;
-  border-radius:50%;
-  font-size:22px;
-  box-shadow:0 0 10px #00ff99;
-  cursor:pointer;
-  z-index:9998;">💬</div>
+  <div id="chat-bubble" style="display:none;position:fixed;bottom:20px;left:20px;background:#00ff99;color:black;
+  padding:10px;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:0 0 10px #00ff99;">💬</div>
 
-<script>
-// 🌿 Voice output in Hindi
-function speakHindi(msg) {
-  const u = new SpeechSynthesisUtterance(msg);
-  u.lang = "hi-IN";
-  u.rate = 1;
-  speechSynthesis.speak(u);
-}
+  <script>
+    async function getPlantStatus() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        if (data.predictedState === "Normal") return "आपका पौधा बिल्कुल ठीक है 🌿";
+        else return "पौधा हल्के तनाव में है 🌱 — ध्यान रखें।";
+      } catch {
+        return "सर्वर से कनेक्शन नहीं हो पा रहा 😔";
+      }
+    }
 
-// 🧠 Fetch live plant condition
-async function getPlantStatus() {
-  try {
-    const res = await fetch("https://phytopulse-org.onrender.com/api/plant-data");
-    const data = await res.json();
+    async function processMessage(msg) {
+      const log = document.getElementById("chat-log");
+      log.innerHTML += `<div><strong>👨‍🌾:</strong> ${msg}</div>`;
+      let reply = "माफ करें, मैं समझ नहीं पाया।";
+      const lower = msg.toLowerCase();
+      if (lower.includes("ok") || lower.includes("plant") || lower.includes("कैसा")) reply = await getPlantStatus();
+      log.innerHTML += `<div><strong>🤖:</strong> ${reply}</div>`;
+      log.scrollTop = log.scrollHeight;
+    }
 
-    if (data.predictedState === "Normal") return "आपका पौधा बिल्कुल ठीक है 🌿";
-    else if (data.predictedState.includes("Stress")) return "पौधा थोड़ा तनाव में है 🌱 — ध्यान रखें।";
-    else if (data.predictedState.includes("Drought")) return "पौधा प्यासा है 🌿 — पानी की आवश्यकता है।";
-    else if (data.predictedState.includes("Pest")) return "चेतावनी! कीट गतिविधि का पता चला 🐛";
-    else return "पौधा सामान्य स्थिति में है 🌱";
-  } catch {
-    return "सर्वर से कनेक्शन नहीं हो पा रहा 😔";
-  }
-}
+    document.getElementById("chat-send").onclick = async () => {
+      const input = document.getElementById("chat-input");
+      if (input.value.trim()) { await processMessage(input.value.trim()); input.value = ""; }
+    };
 
-// 💬 Handle chat message
-async function processMessage(msg) {
-  const log = document.getElementById("chat-log");
-  log.innerHTML += `<div><strong>👨‍🌾 Farmer:</strong> ${msg}</div>`;
+    window.addEventListener("load", () => {
+      const bot = document.getElementById("chatbot");
+      setTimeout(() => {
+        bot.style.bottom = "20px";
+        document.getElementById("chat-log").innerHTML =
+          `<div><strong>🤖:</strong> नमस्ते किसान जी! क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?</div>`;
+      }, 1500);
+    });
 
-  let reply = "माफ करें, मैं समझ नहीं पाया।";
-
-  const lower = msg.toLowerCase();
-
-  if (lower.includes("ok") || lower.includes("fine") || lower.includes("plant") || lower.includes("ठीक") || lower.includes("कैसा")) {
-    reply = await getPlantStatus();
-  } else if (lower.includes("water") || lower.includes("पानी")) {
-    reply = "आप सिंचाई की स्थिति देख सकते हैं 💧 — पौधे के लिए पानी आवश्यक है।";
-  } else if (lower.includes("hello") || lower.includes("hi") || lower.includes("नमस्ते")) {
-    reply = "नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿";
-  } else if (lower.includes("stress")) {
-    reply = "तनाव की स्थिति की जांच कर रहा हूँ 🌱...";
-    const state = await getPlantStatus();
-    reply += " " + state;
-  }
-
-  log.innerHTML += `<div><strong>🤖 PhytoPulse:</strong> ${reply}</div>`;
-  speakHindi(reply);
-  log.scrollTop = log.scrollHeight;
-}
-
-// ✉️ Send button
-document.getElementById("chat-send").onclick = async () => {
-  const input = document.getElementById("chat-input");
-  if (input.value.trim() !== "") {
-    await processMessage(input.value.trim());
-    input.value = "";
-  }
-};
-
-// 🎤 Voice input
-document.getElementById("chat-voice").onclick = () => {
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = "hi-IN";
-  recognition.start();
-
-  recognition.onresult = async (event) => {
-    const msg = event.results[0][0].transcript;
-    await processMessage(msg);
-  };
-
-  recognition.onerror = () => speakHindi("माफ करें, आवाज़ समझ नहीं आई।");
-};
-
-// 👋 Auto-popup chatbot on load
-window.addEventListener("load", () => {
-  const bot = document.getElementById("chatbot");
-  setTimeout(() => {
-    bot.style.bottom = "20px"; // slide up
-    const greeting = "नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?";
-    document.getElementById("chat-log").innerHTML = `<div><strong>🤖 PhytoPulse:</strong> ${greeting}</div>`;
-    speakHindi(greeting);
-  }, 1500);
-});
-
-// 🫧 Minimize and reopen logic
-document.getElementById("minimize-btn").onclick = () => {
-  document.getElementById("chatbot").style.bottom = "-400px";
-  setTimeout(() => {
-    document.getElementById("chat-bubble").style.display = "block";
-  }, 800);
-};
-
-document.getElementById("chat-bubble").onclick = () => {
-  document.getElementById("chat-bubble").style.display = "none";
-  document.getElementById("chatbot").style.bottom = "20px";
-};
-</script>
-
+    document.getElementById("minimize-btn").onclick = () => {
+      document.getElementById("chatbot").style.bottom = "-400px";
+      setTimeout(() => document.getElementById("chat-bubble").style.display = "block", 800);
+    };
+    document.getElementById("chat-bubble").onclick = () => {
+      document.getElementById("chat-bubble").style.display = "none";
+      document.getElementById("chatbot").style.bottom = "20px";
+    };
+  </script>
 </body>
 </html>
-
