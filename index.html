@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       background: #000;
@@ -18,6 +20,7 @@
       overflow-x: hidden;
     }
 
+    /* HEADER */
     header {
       display: flex;
       justify-content: space-between;
@@ -30,59 +33,46 @@
       top: 0;
       z-index: 999;
     }
-
     header .logo {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: #00ff99;
     }
-
     header nav ul {
       list-style: none;
       display: flex;
-      gap: 30px;
+      gap: 25px;
       margin: 0;
       padding: 0;
     }
-
     header nav ul li a {
       color: #fff;
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
     }
+    header nav ul li a:hover { color: #00ff99; }
 
-    header nav ul li a:hover {
-      color: #00ff99;
-    }
-
-    /* Hero Section */
+    /* HERO */
     .hero {
       position: relative;
       height: 90vh;
-      background: url('https://i.ibb.co/TffQpbw/hero-bg.jpg') no-repeat center center/cover;
+      background: url('https://i.ibb.co/TffQpbw/hero-bg.jpg') no-repeat center/cover;
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
       color: #e0ffe0;
-      overflow: hidden;
     }
-
     .hero::before {
       content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      position: absolute; inset: 0;
       background: rgba(0, 0, 0, 0.6);
       z-index: 0;
     }
-
     .hero-content {
       position: relative;
       z-index: 1;
@@ -90,95 +80,41 @@
       padding: 0 20px;
       animation: fadeInUp 1.6s ease-out;
     }
-
-    .hero h1 {
-      font-size: 3.5rem;
-      color: #00ff99;
-      text-shadow: 0 0 20px #00ff99;
-      margin-bottom: 20px;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
-      color: #ccffcc;
-      margin-bottom: 40px;
-    }
-
+    .hero h1 { font-size: 3.2rem; color: #00ff99; text-shadow: 0 0 20px #00ff99; margin-bottom: 20px; }
+    .hero p { font-size: 1.1rem; margin-bottom: 40px; }
     .hero a {
-      background: #00ff99;
-      color: #000;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 0 20px #00ff99;
-      transition: all 0.3s ease;
+      background: #00ff99; color: #000; padding: 12px 28px;
+      border-radius: 30px; font-weight: 600; text-decoration: none;
+      box-shadow: 0 0 20px #00ff99; transition: all 0.3s ease;
     }
+    .hero a:hover { transform: scale(1.05); box-shadow: 0 0 35px #00ff99; }
 
-    .hero a:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 35px #00ff99;
-    }
-
+    /* SECTIONS WITH SMOOTH SCROLL ANIMATIONS */
     section {
-      padding: 80px 10%;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(60px);
+      padding: 80px 10%; text-align: center;
+      opacity: 0; transform: translateY(80px);
       transition: all 1s ease-out;
     }
+    section.visible { opacity: 1; transform: translateY(0); }
 
-    section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    h2 { color: #00ff99; font-size: 2rem; text-shadow: 0 0 15px #00ff99; }
 
-    h2 {
-      color: #00ff99;
-      font-size: 2rem;
-      margin-bottom: 20px;
-      text-shadow: 0 0 15px #00ff99;
-    }
-
+    /* TECHNOLOGY SECTION */
     #technology {
-      background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center center/cover;
-      color: #fff;
-      position: relative;
-      padding: 120px 40px;
+      background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center/cover;
+      color: #fff; position: relative; padding: 120px 40px;
     }
-
     #technology::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 0;
+      content: ""; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 0;
     }
-
-    #technology div {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-      margin: auto;
-    }
+    #technology div { position: relative; z-index: 1; max-width: 800px; margin: auto; }
 
     .card {
-      background: #0a1a0a;
-      color: #ccffcc;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px #00ff99;
-      width: 280px;
-      transition: transform 0.3s ease;
+      background: #0a1a0a; color: #ccffcc; padding: 25px; border-radius: 15px;
+      box-shadow: 0 0 15px #00ff99; width: 280px; transition: transform 0.3s ease;
     }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px #00ff99;
-    }
+    .card:hover { transform: scale(1.05); box-shadow: 0 0 30px #00ff99; }
 
     .benefit-grid {
       display: flex;
@@ -188,78 +124,64 @@
     }
 
     footer {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
+      background: #000; color: #fff; text-align: center; padding: 20px;
       border-top: 1px solid #00ff99;
     }
 
-    /* Popup Alert */
+    /* 🔔 ALERT POPUP */
     #alertPopup {
-      display: none;
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: rgba(0, 0, 0, 0.85);
-      border-left: 6px solid #00ff99;
-      padding: 20px;
-      color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #00ff99;
-      z-index: 9999;
-      max-width: 350px;
+      display: none; position: fixed; bottom: 30px; right: 30px;
+      background: rgba(0,0,0,0.9); border-left: 6px solid #00ff99;
+      padding: 20px; color: white; border-radius: 12px;
+      box-shadow: 0 0 25px #00ff99; z-index: 9999; max-width: 360px;
+      animation: slideUp 0.6s ease;
     }
+    #alertAction {
+      margin-top: 12px;
+      background: #00ff99; color: #000; padding: 8px 15px;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-weight: 600; transition: 0.3s;
+    }
+    #alertAction:hover { background: #33ffaa; }
 
-    /* Chatbot */
+    /* 💬 CHATBOT */
     #chatbot {
-      position: fixed;
-      bottom: -400px;
-      left: 20px;
-      width: 320px;
-      background: rgba(0, 0, 0, 0.9);
-      color: white;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px #00ff99;
-      transition: bottom 0.8s ease-in-out;
-      z-index: 9999;
+      position: fixed; bottom: -400px; left: 20px; width: 320px;
+      background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px;
+      box-shadow: 0 0 15px #00ff99; transition: bottom 0.8s ease-in-out; z-index: 9999;
     }
-
     #chat-bubble {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: #00ff99;
-      color: black;
-      padding: 10px 14px;
-      border-radius: 50%;
-      font-size: 22px;
-      box-shadow: 0 0 10px #00ff99;
-      cursor: pointer;
-      z-index: 9998;
+      display: none; position: fixed; bottom: 20px; left: 20px;
+      background: #00ff99; color: black; padding: 10px 14px; border-radius: 50%;
+      font-size: 22px; box-shadow: 0 0 10px #00ff99; cursor: pointer; z-index: 9998;
     }
 
+    /* ✨ Animations */
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* 📱 MOBILE RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      header { flex-direction: column; padding: 15px 30px; }
+      header nav ul { flex-direction: column; gap: 10px; align-items: center; }
+      .hero h1 { font-size: 2rem; }
+      .hero p { font-size: 1rem; }
+      section { padding: 60px 5%; }
+      .card { width: 90%; }
+      #chatbot { width: 90%; left: 5%; }
+      #alertPopup { right: 10px; left: 10px; max-width: unset; }
     }
   </style>
 </head>
-
 <body>
   <header>
-    <div class="logo">
-      <img src="phytopulse.png" style="height: 40px" />
-      PhytoPulse
-    </div>
+    <div class="logo"><img src="phytopulse.png" style="height: 40px" />PhytoPulse</div>
     <nav>
       <ul>
         <li><a href="#about">About</a></li>
@@ -279,24 +201,12 @@
     </div>
   </section>
 
-  <section id="about">
-    <h2>About PhytoPulse</h2>
-    <p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p>
-  </section>
-
-  <section id="model">
-    <h2>AI Model Development</h2>
-    <p>The collected plant bio-signal data trains our AI model to detect plant stress early.</p>
-  </section>
+  <section id="about"><h2>About PhytoPulse</h2><p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p></section>
+  <section id="model"><h2>AI Model Development</h2><p>The collected plant bio-signal data trains our AI model to detect plant stress early.</p></section>
 
   <section id="technology">
-    <div>
-      <h2>How It Works</h2>
-      <p>
-        Our AI-driven sensors capture electrical signals from plants, revealing stress and adaptation before visible
-        symptoms appear.
-      </p>
-    </div>
+    <div><h2 style="color:white;text-shadow:0 0 20px #00ff99;">How It Works</h2>
+      <p>Our AI-driven sensors capture electrical signals revealing plant stress and emotions before visible signs.</p></div>
   </section>
 
   <section id="benefits">
@@ -314,17 +224,16 @@
     <div id="plant-data" style="margin-top:30px;color:#00ff99;"></div>
   </section>
 
-  <section>
-    <h2>🌿 Simulated Plant Signal Patterns</h2>
-    <canvas id="pythonSimChart" width="800" height="400" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
-  </section>
-
   <footer>© 2025 PhytoPulse</footer>
 
-  <!-- ALERT Popup -->
-  <div id="alertPopup"><strong id="alertTitle"></strong><p id="alertMessage"></p></div>
+  <!-- 🔔 ALERT POPUP -->
+  <div id="alertPopup">
+    <strong id="alertTitle"></strong>
+    <p id="alertMessage"></p>
+    <button id="alertAction"></button>
+  </div>
 
-  <!-- Chatbot -->
+  <!-- 💬 CHATBOT -->
   <div id="chatbot">
     <div style="display:flex;justify-content:space-between;">
       <strong>🤖 PhytoPulse सहायक</strong>
@@ -337,7 +246,6 @@
       <button id="chat-voice" style="background:#66ccff;border:none;color:#000;padding:6px 10px;border-radius:6px;cursor:pointer;">🎤 Speak</button>
     </div>
   </div>
-
   <div id="chat-bubble">💬</div>
 
   <script>
@@ -345,132 +253,117 @@
       ? "http://localhost:5000/api/plant-data"
       : "https://phytopulse-org.onrender.com/api/plant-data";
 
-    // Fade animation observer
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
-    }, { threshold: 0.2 });
-    document.querySelectorAll("section").forEach(el => observer.observe(el));
+    function speakHindi(msg){const u=new SpeechSynthesisUtterance(msg);u.lang="hi-IN";speechSynthesis.speak(u);}
 
-    // Voice in Hindi
-    function speakHindi(msg) {
-      const u = new SpeechSynthesisUtterance(msg);
-      u.lang = "hi-IN";
-      u.rate = 1;
-      speechSynthesis.speak(u);
+    // Smooth section reveal animations
+    const observer=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){e.target.classList.add("visible");}
+      });
+    },{threshold:0.2});
+    document.querySelectorAll("section").forEach(el=>observer.observe(el));
+
+    // ⚠️ Smart Alerts with 1-Minute Cooldown
+    let cooldown=0,lastAlert="";
+    function showAlert(state,msg){
+      if(cooldown>0)return;
+      cooldown=60;
+      const popup=document.getElementById("alertPopup");
+      const title=document.getElementById("alertTitle");
+      const message=document.getElementById("alertMessage");
+      const action=document.getElementById("alertAction");
+
+      let actionText="जाँच जारी रखें 🌿";
+      if(state.toLowerCase().includes("drought")||state.toLowerCase().includes("stress")) actionText="💧 पानी दें";
+      else if(state.toLowerCase().includes("heat")) actionText="🌤 छाया प्रदान करें";
+      else if(state.toLowerCase().includes("pest")) actionText="🐛 कीटनाशक का उपयोग करें";
+
+      title.innerHTML=`🚨 ${state}`;
+      message.innerHTML=msg+`<br><small>⏳ अगली जाँच 60 सेकंड में...</small>`;
+      action.innerText=actionText;
+      action.onclick=()=>speakHindi(actionText);
+
+      popup.style.display="block";
+      speakHindi(msg+" "+actionText);
+      setTimeout(()=>popup.style.display="none",7000);
     }
+    setInterval(()=>{if(cooldown>0)cooldown--;},1000);
 
-    // Show Alerts
-    function showAlert(state, msg) {
-      const popup = document.getElementById("alertPopup");
-      const title = document.getElementById("alertTitle");
-      const message = document.getElementById("alertMessage");
-      let color = "#00ff99";
-      if (state.includes("Heat")) color = "#ff8800";
-      else if (state.includes("Drought")) color = "#ffaa00";
-      else if (state.includes("Pest")) color = "#ff5555";
-      popup.style.borderLeft = `6px solid ${color}`;
-      title.innerHTML = `🚨 ${state}`;
-      message.innerHTML = msg;
-      popup.style.display = "block";
-      speakHindi(msg);
-      setTimeout(() => (popup.style.display = "none"), 7000);
-    }
-
-    // Chart setup
-    const ctx = document.getElementById("plantChart").getContext("2d");
-    const timeLabels = [], signalData = [];
-    const chart = new Chart(ctx, {
-      type: "line",
-      data: { labels: timeLabels, datasets: [{ label: "Signal Strength (V)", data: signalData, borderColor: "#00ff99", fill: true, tension: 0.3 }] },
-      options: { scales: { x: { ticks: { color: "#ccffcc" } }, y: { min: 0, max: 5, ticks: { color: "#ccffcc" } } }, plugins: { legend: { labels: { color: "#00ff99" } } } }
+    // 🌿 Live Chart
+    const ctx=document.getElementById("plantChart").getContext("2d");
+    const labels=[],dataPoints=[];
+    const chart=new Chart(ctx,{
+      type:"line",
+      data:{labels,datasets:[{label:"Signal (V)",data:dataPoints,borderColor:"#00ff99",tension:0.3,fill:true,backgroundColor:"rgba(0,255,153,0.2)"}]},
+      options:{scales:{x:{ticks:{color:"#ccffcc"}},y:{min:0,max:5,ticks:{color:"#ccffcc"}}}}
     });
 
-    async function fetchPlantData() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        const now = new Date().toLocaleTimeString();
-        if (timeLabels.length > 20) { timeLabels.shift(); signalData.shift(); }
-        timeLabels.push(now);
-        signalData.push(data.signalStrength);
-        chart.update();
-        document.getElementById("plant-data").innerHTML = `
+    async function fetchPlantData(){
+      try{
+        const r=await fetch(API_URL);
+        const d=await r.json();
+        const now=new Date().toLocaleTimeString();
+        if(labels.length>20){labels.shift();dataPoints.shift();}
+        labels.push(now);dataPoints.push(d.signalStrength);chart.update();
+        document.getElementById("plant-data").innerHTML=`
           <h3>🌿 Live Plant Data</h3>
-          <p><strong>Moisture:</strong> ${data.moisture}%</p>
-          <p><strong>Temperature:</strong> ${data.temperature}°C</p>
-          <p><strong>Signal:</strong> ${data.signalStrength} V</p>
-          <p><strong>Emotion:</strong> ${data.emotion}</p>`;
-        if (data.predictedState !== "Normal") showAlert(data.predictedState, data.alertMessage || "पौधा तनाव में है!");
-      } catch (e) { console.error(e); }
+          <p>Moisture: ${d.moisture}% | Temp: ${d.temperature}°C</p>
+          <p>Signal: ${d.signalStrength}V | Emotion: ${d.emotion}</p>
+          <p><small>Last updated: ${d.timestamp}</small></p>`;
+        if(d.predictedState!=="Normal"&&d.alertMessage!==lastAlert){
+          showAlert(d.predictedState,d.alertMessage);
+          lastAlert=d.alertMessage;
+        }
+      }catch(e){console.error(e);}
     }
-    setInterval(fetchPlantData, 10000);
+    setInterval(fetchPlantData,5000);
     fetchPlantData();
 
-    // Simulated chart
-    const ctx2 = document.getElementById("pythonSimChart").getContext("2d");
-    const states = ["Normal", "Heat Stress", "Drought Stress", "Pest Attack"];
-    function simulate(state) {
-      let base = Array.from({ length: 100 }, () => Math.random() * 0.5);
-      if (state === "Heat Stress") base = base.map((v, i) => v + Math.sin(i / 10) * 0.8);
-      if (state === "Drought Stress") base = base.map(v => v + Math.random() * 0.4 + 0.8);
-      if (state === "Pest Attack") base = base.map(v => v + (Math.random() > 0.9 ? 0.8 : 0));
-      return base;
+    // 💬 Chatbot
+    async function getPlantStatus(){
+      try{
+        const r=await fetch(API_URL);
+        const d=await r.json();
+        if(d.predictedState==="Normal")return"आपका पौधा बिल्कुल ठीक है 🌿";
+        else return"पौधा तनाव में है 🌱 — ध्यान रखें।";
+      }catch{return"सर्वर से कनेक्शन नहीं हो पा रहा 😔";}
     }
-    const simData = states.map(s => ({ label: s, data: simulate(s), borderColor: s === "Normal" ? "#00ff99" : s === "Heat Stress" ? "#ff5555" : s === "Drought Stress" ? "#ffaa00" : "#8888ff", fill: false, tension: 0.3 }));
-    new Chart(ctx2, { type: "line", data: { labels: Array.from({ length: 100 }, (_, i) => `s${i}`), datasets: simData }, options: { plugins: { legend: { labels: { color: "#00ff99" } }, title: { display: true, text: "Simulated Electrical Signal Activity", color: "#00ff99" } }, scales: { x: { ticks: { color: "#ccffcc" } }, y: { min: -1, max: 3, ticks: { color: "#ccffcc" } } } } });
-    setInterval(() => { simData.forEach(d => (d.data = simulate(d.label))); Chart.getChart(ctx2)?.update(); }, 5000);
-
-    // Chatbot logic
-    async function getPlantStatus() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        if (data.predictedState === "Normal") return "आपका पौधा बिल्कुल ठीक है 🌿";
-        else return "पौधा तनाव में है 🌱 — ध्यान रखें।";
-      } catch { return "सर्वर से कनेक्शन नहीं हो पा रहा 😔"; }
-    }
-
-    async function processMessage(msg) {
-      const log = document.getElementById("chat-log");
-      log.innerHTML += `<div><strong>👨‍🌾:</strong> ${msg}</div>`;
-      let reply = "माफ करें, मैं समझ नहीं पाया।";
-      const lower = msg.toLowerCase();
-      if (lower.includes("plant") || lower.includes("कैसा")) reply = await getPlantStatus();
-      else if (lower.includes("hello") || lower.includes("hi") || lower.includes("नमस्ते")) reply = "नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿";
-      log.innerHTML += `<div><strong>🤖:</strong> ${reply}</div>`;
+    async function processMessage(msg){
+      const log=document.getElementById("chat-log");
+      log.innerHTML+=`<div><strong>👨‍🌾:</strong> ${msg}</div>`;
+      let reply="माफ करें, मैं समझ नहीं पाया।";
+      const lower=msg.toLowerCase();
+      if(lower.includes("plant")||lower.includes("कैसा"))reply=await getPlantStatus();
+      else if(lower.includes("hello")||lower.includes("hi")||lower.includes("नमस्ते"))reply="नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿";
+      log.innerHTML+=`<div><strong>🤖:</strong> ${reply}</div>`;
       speakHindi(reply);
-      log.scrollTop = log.scrollHeight;
+      log.scrollTop=log.scrollHeight;
     }
-
-    document.getElementById("chat-send").onclick = async () => {
-      const input = document.getElementById("chat-input");
-      if (input.value.trim()) { await processMessage(input.value.trim()); input.value = ""; }
+    document.getElementById("chat-send").onclick=async()=>{
+      const i=document.getElementById("chat-input");
+      if(i.value.trim()){await processMessage(i.value.trim());i.value="";}
     };
-
-    document.getElementById("chat-voice").onclick = () => {
-      const recog = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recog.lang = "hi-IN";
-      recog.start();
-      recog.onresult = async (e) => { const msg = e.results[0][0].transcript; await processMessage(msg); };
+    document.getElementById("chat-voice").onclick=()=>{
+      const recog=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+      recog.lang="hi-IN";recog.start();
+      recog.onresult=async e=>{await processMessage(e.results[0][0].transcript);};
     };
-
-    window.addEventListener("load", () => {
-      const bot = document.getElementById("chatbot");
-      setTimeout(() => {
-        bot.style.bottom = "20px";
-        const greet = "नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?";
-        document.getElementById("chat-log").innerHTML = `<div><strong>🤖:</strong> ${greet}</div>`;
+    window.addEventListener("load",()=>{
+      const bot=document.getElementById("chatbot");
+      setTimeout(()=>{
+        bot.style.bottom="20px";
+        const greet="नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?";
+        document.getElementById("chat-log").innerHTML=`<div><strong>🤖:</strong> ${greet}</div>`;
         speakHindi(greet);
-      }, 1500);
+      },1500);
     });
-
-    document.getElementById("minimize-btn").onclick = () => {
-      document.getElementById("chatbot").style.bottom = "-400px";
-      setTimeout(() => document.getElementById("chat-bubble").style.display = "block", 800);
+    document.getElementById("minimize-btn").onclick=()=>{
+      document.getElementById("chatbot").style.bottom="-400px";
+      setTimeout(()=>document.getElementById("chat-bubble").style.display="block",800);
     };
-    document.getElementById("chat-bubble").onclick = () => {
-      document.getElementById("chat-bubble").style.display = "none";
-      document.getElementById("chatbot").style.bottom = "20px";
+    document.getElementById("chat-bubble").onclick=()=>{
+      document.getElementById("chat-bubble").style.display="none";
+      document.getElementById("chatbot").style.bottom="20px";
     };
   </script>
 </body>
