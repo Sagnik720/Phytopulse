@@ -366,5 +366,49 @@
       document.getElementById("chatbot").style.bottom="20px";
     };
   </script>
+
+  <script>
+let lastAlertTime = 0;
+const cooldown = 60 * 1000; // 1 minute in milliseconds
+
+// 🗣️ Function to speak message aloud (Hindi)
+function speakAlert(message) {
+  const utterance = new SpeechSynthesisUtterance(message);
+  utterance.lang = "hi-IN";  // Hindi voice
+  utterance.rate = 1;        // normal speed
+  utterance.pitch = 1;       // normal tone
+  speechSynthesis.speak(utterance);
+}
+
+// 🌿 Function to show alert + enforce cooldown
+function showAlert(message) {
+  const now = Date.now();
+  if (now - lastAlertTime < cooldown) {
+    console.log("⏳ Cooldown active — skipping alert");
+    return; // Skip if within cooldown
+  }
+  lastAlertTime = now;
+
+  alert(message + " 🌿 (अगला अलर्ट 1 मिनट बाद आएगा)");
+  speakAlert(message);
+}
+
+// 🌱 Example simulation — replace later with sensor data or AI logic
+function checkPlantStatus() {
+  const waterLevel = Math.random();
+  const pestDetected = Math.random();
+
+  if (waterLevel < 0.3) {
+    showAlert("🚰 पौधों को पानी की आवश्यकता है!");
+  } else if (pestDetected < 0.2) {
+    showAlert("🐛 पौधों पर कीट हमला पाया गया!");
+  }
+}
+
+// ⏲️ Run every 15 seconds
+setInterval(checkPlantStatus, 15000);
+</script>
+  
 </body>
 </html>
+
