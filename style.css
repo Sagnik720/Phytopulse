@@ -240,6 +240,33 @@ footer {
   border-top: 1px solid rgba(0, 255, 128, 0.2);
   color: #aaa;
 }
+/* === Insights Section: Chart === */
+.insights {
+  position: relative;
+  margin-top: 2rem;
+  padding: 4rem 2rem;
+}
+
+.insights canvas {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  height: 400px;              /* ensures it’s visible */
+  min-height: 300px;
+  margin: 0 auto;
+  border-radius: 15px;
+  background: rgba(0, 255, 153, 0.05);  /* faint neon backdrop */
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.1);
+}
+
+#plant-data {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #aaffcc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -261,3 +288,4 @@ footer {
     font-size: 2.2rem;
   }
 }
+
