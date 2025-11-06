@@ -1,414 +1,204 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PhytoPulse — Plant Emotion Network</title>
-  <link rel="icon" type="image/png" href="phytopulse.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌿 PhytoPulse 2025</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-
   <style>
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      background: #000;
-      color: #ccffcc;
       font-family: "Poppins", sans-serif;
-      scroll-behavior: smooth;
+      background: radial-gradient(circle at center, #001100, #000);
+      color: #ccffcc;
       overflow-x: hidden;
     }
-
-    /* HEADER */
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 60px;
-      background: #000;
-      border-bottom: 1px solid #00ff99;
-      box-shadow: 0 0 20px #00ff99;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-    header .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #00ff99;
-    }
-    header nav ul {
-      list-style: none;
-      display: flex;
-      gap: 25px;
-      margin: 0;
-      padding: 0;
-    }
-    header nav ul li a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-    header nav ul li a:hover { color: #00ff99; }
-
-    /* HERO */
-    .hero {
-      position: relative;
-      height: 90vh;
-      background: url('https://i.ibb.co/TffQpbw/hero-bg.jpg') no-repeat center/cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       text-align: center;
-      color: #e0ffe0;
+      padding: 60px 20px;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 3rem;
+      font-weight: 800;
+      animation: neon 2s infinite alternate;
     }
-    .hero::before {
-      content: "";
-      position: absolute; inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 0;
+    @keyframes neon {
+      from { text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88; }
+      to { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
     }
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-      padding: 0 20px;
-      animation: fadeInUp 1.6s ease-out;
-    }
-    .hero h1 { font-size: 3.2rem; color: #00ff99; text-shadow: 0 0 20px #00ff99; margin-bottom: 20px; }
-    .hero p { font-size: 1.1rem; margin-bottom: 40px; }
-    .hero a {
-      background: #00ff99; color: #000; padding: 12px 28px;
-      border-radius: 30px; font-weight: 600; text-decoration: none;
-      box-shadow: 0 0 20px #00ff99; transition: all 0.3s ease;
-    }
-    .hero a:hover { transform: scale(1.05); box-shadow: 0 0 35px #00ff99; }
 
-    /* SECTIONS WITH SMOOTH SCROLL ANIMATIONS */
     section {
-      padding: 80px 10%; text-align: center;
-      opacity: 0; transform: translateY(80px);
-      transition: all 1s ease-out;
+      padding: 60px 20px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1s ease;
     }
-    section.visible { opacity: 1; transform: translateY(0); }
-
-    h2 { color: #00ff99; font-size: 2rem; text-shadow: 0 0 15px #00ff99; }
-
-    /* TECHNOLOGY SECTION */
-    #technology {
-      background: url('https://i.ibb.co/BHwX4P5W/beautiful-fern-leaves-black-background.jpg') no-repeat center/cover;
-      color: #fff; position: relative; padding: 120px 40px;
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-    #technology::before {
-      content: ""; position: absolute; inset: 0;
-      background: rgba(0,0,0,0.6); z-index: 0;
-    }
-    #technology div { position: relative; z-index: 1; max-width: 800px; margin: auto; }
+    h2 { color: #00ffcc; font-size: 2rem; margin-bottom: 10px; }
 
-    .card {
-      background: #0a1a0a; color: #ccffcc; padding: 25px; border-radius: 15px;
-      box-shadow: 0 0 15px #00ff99; width: 280px; transition: transform 0.3s ease;
-    }
-    .card:hover { transform: scale(1.05); box-shadow: 0 0 30px #00ff99; }
+    canvas { width: 90%; max-width: 700px; height: 350px; margin-top: 20px; }
 
-    .benefit-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-    }
-
-    footer {
-      background: #000; color: #fff; text-align: center; padding: 20px;
-      border-top: 1px solid #00ff99;
-    }
-
-    /* 🔔 ALERT POPUP */
+    /* Alert Popup */
     #alertPopup {
-      display: none; position: fixed; bottom: 30px; right: 30px;
-      background: rgba(0,0,0,0.9); border-left: 6px solid #00ff99;
-      padding: 20px; color: white; border-radius: 12px;
-      box-shadow: 0 0 25px #00ff99; z-index: 9999; max-width: 360px;
-      animation: slideUp 0.6s ease;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(0, 255, 153, 0.2);
+      border: 2px solid #00ff88;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 15px #00ff88;
+      color: #ccffcc;
+      display: none;
+      width: 280px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      animation: fadein 1s ease;
     }
-    #alertAction {
-      margin-top: 12px;
-      background: #00ff99; color: #000; padding: 8px 15px;
-      border: none; border-radius: 8px; cursor: pointer;
-      font-weight: 600; transition: 0.3s;
-    }
-    #alertAction:hover { background: #33ffaa; }
-
-    /* 💬 CHATBOT */
-    #chatbot {
-      position: fixed; bottom: -400px; left: 20px; width: 320px;
-      background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px;
-      box-shadow: 0 0 15px #00ff99; transition: bottom 0.8s ease-in-out; z-index: 9999;
-    }
-    #chat-bubble {
-      display: none; position: fixed; bottom: 20px; left: 20px;
-      background: #00ff99; color: black; padding: 10px 14px; border-radius: 50%;
-      font-size: 22px; box-shadow: 0 0 10px #00ff99; cursor: pointer; z-index: 9998;
-    }
-
-    /* ✨ Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes slideUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    #alertAction {
+      background: #00ff99;
+      color: #000;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
     }
+    #alertAction:hover { background: #00ffaa; }
 
-    /* 📱 MOBILE RESPONSIVE DESIGN */
-    @media (max-width: 768px) {
-      header { flex-direction: column; padding: 15px 30px; }
-      header nav ul { flex-direction: column; gap: 10px; align-items: center; }
-      .hero h1 { font-size: 2rem; }
-      .hero p { font-size: 1rem; }
-      section { padding: 60px 5%; }
-      .card { width: 90%; }
-      #chatbot { width: 90%; left: 5%; }
-      #alertPopup { right: 10px; left: 10px; max-width: unset; }
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #66ffcc;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo"><img src="phytopulse.png" style="height: 40px" />PhytoPulse</div>
-    <nav>
-      <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#model">AI Model</a></li>
-        <li><a href="#technology">Technology</a></li>
-        <li><a href="#benefits">Benefits</a></li>
-        <li><a href="#insights">Insights</a></li>
-      </ul>
-    </nav>
-  </header>
+  <header>🌿 PhytoPulse 2025</header>
 
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Giving Plants a Voice</h1>
-      <p>Discover how PhytoPulse translates plant bio-signals into insights using AI and neuroscience.</p>
-      <a href="#insights">Explore Dashboard</a>
-    </div>
+  <section>
+    <h2>How It Works</h2>
+    <p>PhytoPulse senses plant signals — monitoring stress, hydration, and pest activity — using AI and bio-sensors.</p>
   </section>
 
-  <section id="about"><h2>About PhytoPulse</h2><p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p></section>
-  <section id="model"><h2>AI Model Development</h2><p>The collected plant bio-signal data trains our AI model to detect plant stress early.</p></section>
-
-  <section id="technology">
-    <div><h2 style="color:white;text-shadow:0 0 20px #00ff99;">How It Works</h2>
-      <p>Our AI-driven sensors capture electrical signals revealing plant stress and emotions before visible signs.</p></div>
+  <section>
+    <h2>Real-Time Plant Health</h2>
+    <canvas id="plantChart"></canvas>
   </section>
 
-  <section id="benefits">
-    <h2>Why PhytoPulse?</h2>
-    <div class="benefit-grid">
-      <div class="card"><h3>Early Detection</h3><p>Predict stress before visible damage.</p></div>
-      <div class="card"><h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p></div>
-      <div class="card"><h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p></div>
-    </div>
-  </section>
-
-  <section id="insights">
-    <h2>Live Plant Communication Dashboard</h2>
-    <canvas id="plantChart" width="700" height="350" style="background:#0a1a0a;border-radius:15px;box-shadow:0 0 20px #00ff99;"></canvas>
-    <div id="plant-data" style="margin-top:30px;color:#00ff99;"></div>
-  </section>
-
-  <footer>© 2025 PhytoPulse</footer>
-
-  <!-- 🔔 ALERT POPUP -->
   <div id="alertPopup">
-    <strong id="alertTitle"></strong>
+    <h3 id="alertTitle"></h3>
     <p id="alertMessage"></p>
     <button id="alertAction"></button>
   </div>
 
-  <!-- 💬 CHATBOT -->
-  <div id="chatbot">
-    <div style="display:flex;justify-content:space-between;">
-      <strong>🤖 PhytoPulse सहायक</strong>
-      <button id="minimize-btn" style="background:none;border:none;color:#00ff99;cursor:pointer;">−</button>
-    </div>
-    <div id="chat-log" style="max-height:200px;overflow-y:auto;margin:10px 0;font-size:14px;"></div>
-    <input id="chat-input" type="text" placeholder="Type in English or Hindi..." style="width:100%;padding:8px;border-radius:8px;border:none;">
-    <div style="margin-top:8px;display:flex;justify-content:space-between;">
-      <button id="chat-send" style="background:#00ff99;border:none;color:#000;padding:6px 10px;border-radius:6px;cursor:pointer;">Send</button>
-      <button id="chat-voice" style="background:#66ccff;border:none;color:#000;padding:6px 10px;border-radius:6px;cursor:pointer;">🎤 Speak</button>
-    </div>
-  </div>
-  <div id="chat-bubble">💬</div>
+  <footer>© 2025 PhytoPulse — Connecting Nature with Intelligence 🌱</footer>
 
   <script>
-    const API_URL = window.location.hostname.includes("localhost")
-      ? "http://localhost:5000/api/plant-data"
-      : "https://phytopulse-org.onrender.com/api/plant-data";
-
-    function speakHindi(msg){const u=new SpeechSynthesisUtterance(msg);u.lang="hi-IN";speechSynthesis.speak(u);}
-
-    // Smooth section reveal animations
-    const observer=new IntersectionObserver(entries=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){e.target.classList.add("visible");}
+    // 🌿 Scroll Animation
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add("visible");
+        else e.target.classList.remove("visible");
       });
-    },{threshold:0.2});
-    document.querySelectorAll("section").forEach(el=>observer.observe(el));
+    }, { threshold: 0.2 });
+    document.querySelectorAll("section").forEach(el => observer.observe(el));
 
-    // ⚠️ Smart Alerts with 1-Minute Cooldown
-    let cooldown=0,lastAlert="";
-    function showAlert(state,msg){
-      if(cooldown>0)return;
-      cooldown=60;
-      const popup=document.getElementById("alertPopup");
-      const title=document.getElementById("alertTitle");
-      const message=document.getElementById("alertMessage");
-      const action=document.getElementById("alertAction");
-
-      let actionText="जाँच जारी रखें 🌿";
-      if(state.toLowerCase().includes("drought")||state.toLowerCase().includes("stress")) actionText="💧 पानी दें";
-      else if(state.toLowerCase().includes("heat")) actionText="🌤 छाया प्रदान करें";
-      else if(state.toLowerCase().includes("pest")) actionText="🐛 कीटनाशक का उपयोग करें";
-
-      title.innerHTML=`🚨 ${state}`;
-      message.innerHTML=msg+`<br><small>⏳ अगली जाँच 60 सेकंड में...</small>`;
-      action.innerText=actionText;
-      action.onclick=()=>speakHindi(actionText);
-
-      popup.style.display="block";
-      speakHindi(msg+" "+actionText);
-      setTimeout(()=>popup.style.display="none",7000);
-    }
-    setInterval(()=>{if(cooldown>0)cooldown--;},1000);
-
-    // 🌿 Live Chart
-    const ctx=document.getElementById("plantChart").getContext("2d");
-    const labels=[],dataPoints=[];
-    const chart=new Chart(ctx,{
-      type:"line",
-      data:{labels,datasets:[{label:"Signal (V)",data:dataPoints,borderColor:"#00ff99",tension:0.3,fill:true,backgroundColor:"rgba(0,255,153,0.2)"}]},
-      options:{scales:{x:{ticks:{color:"#ccffcc"}},y:{min:0,max:5,ticks:{color:"#ccffcc"}}}}
+    // 🧠 Chart + Alert System
+    const ctx = document.getElementById("plantChart").getContext("2d");
+    const labels=[], heat=[], drought=[], stress=[], pest=[];
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Heat Stress", data: heat, borderColor: "#ff4444", backgroundColor: "rgba(255,68,68,0.2)", tension: 0.3, fill: true },
+          { label: "Drought Stress", data: drought, borderColor: "#ffaa00", backgroundColor: "rgba(255,170,0,0.2)", tension: 0.3, fill: true },
+          { label: "General Stress", data: stress, borderColor: "#00ff99", backgroundColor: "rgba(0,255,153,0.2)", tension: 0.3, fill: true },
+          { label: "Pest Activity", data: pest, borderColor: "#66ccff", backgroundColor: "rgba(102,204,255,0.2)", tension: 0.3, fill: true }
+        ]
+      },
+      options: {
+        scales: {
+          x: { ticks: { color: "#ccffcc" }},
+          y: { min: 0, max: 100, ticks: { color: "#ccffcc" }}
+        },
+        plugins: { legend: { labels: { color: "#ccffcc" }} }
+      }
     });
 
-    async function fetchPlantData(){
-      try{
-        const r=await fetch(API_URL);
-        const d=await r.json();
-        const now=new Date().toLocaleTimeString();
-        if(labels.length>20){labels.shift();dataPoints.shift();}
-        labels.push(now);dataPoints.push(d.signalStrength);chart.update();
-        document.getElementById("plant-data").innerHTML=`
-          <h3>🌿 Live Plant Data</h3>
-          <p>Moisture: ${d.moisture}% | Temp: ${d.temperature}°C</p>
-          <p>Signal: ${d.signalStrength}V | Emotion: ${d.emotion}</p>
-          <p><small>Last updated: ${d.timestamp}</small></p>`;
-        if(d.predictedState!=="Normal"&&d.alertMessage!==lastAlert){
-          showAlert(d.predictedState,d.alertMessage);
-          lastAlert=d.alertMessage;
-        }
-      }catch(e){console.error(e);}
+    // 🔊 Speech
+    function speakHindi(msg) {
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = "hi-IN";
+      u.rate = 1;
+      u.pitch = 1;
+      speechSynthesis.speak(u);
     }
-    setInterval(fetchPlantData,5000);
-    fetchPlantData();
 
-    // 💬 Chatbot
-    async function getPlantStatus(){
-      try{
-        const r=await fetch(API_URL);
-        const d=await r.json();
-        if(d.predictedState==="Normal")return"आपका पौधा बिल्कुल ठीक है 🌿";
-        else return"पौधा तनाव में है 🌱 — ध्यान रखें।";
-      }catch{return"सर्वर से कनेक्शन नहीं हो पा रहा 😔";}
+    // 🌿 Smart Alert with 1-min Cooldown
+    let lastAlertTime = 0;
+    const cooldown = 60 * 1000; // 1 minute
+
+    function showSmartAlert(state, msg) {
+      const now = Date.now();
+      if (now - lastAlertTime < cooldown) {
+        console.log("⏳ Cooldown active — skipping alert");
+        return;
+      }
+      lastAlertTime = now;
+
+      const popup = document.getElementById("alertPopup");
+      const title = document.getElementById("alertTitle");
+      const message = document.getElementById("alertMessage");
+      const action = document.getElementById("alertAction");
+
+      let actionText = "🌿 निगरानी जारी रखें";
+      if (state.includes("Drought")) actionText = "💧 पानी दें";
+      else if (state.includes("Heat")) actionText = "🌤 छाया प्रदान करें";
+      else if (state.includes("Pest")) actionText = "🐛 कीटनाशक का उपयोग करें";
+
+      title.innerHTML = "🚨 " + state;
+      message.innerHTML = msg + "<br><small>⏳ अगला अलर्ट 1 मिनट बाद...</small>";
+      action.innerText = actionText;
+      action.onclick = () => speakHindi(actionText);
+
+      popup.style.display = "block";
+      speakHindi(msg + " " + actionText);
+      setTimeout(() => popup.style.display = "none", 7000);
     }
-    async function processMessage(msg){
-      const log=document.getElementById("chat-log");
-      log.innerHTML+=`<div><strong>👨‍🌾:</strong> ${msg}</div>`;
-      let reply="माफ करें, मैं समझ नहीं पाया।";
-      const lower=msg.toLowerCase();
-      if(lower.includes("plant")||lower.includes("कैसा"))reply=await getPlantStatus();
-      else if(lower.includes("hello")||lower.includes("hi")||lower.includes("नमस्ते"))reply="नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿";
-      log.innerHTML+=`<div><strong>🤖:</strong> ${reply}</div>`;
-      speakHindi(reply);
-      log.scrollTop=log.scrollHeight;
+
+    // 📈 Simulated Real-time Data
+    function updateChart() {
+      const now = new Date().toLocaleTimeString();
+      if (labels.length > 15) { labels.shift(); heat.shift(); drought.shift(); stress.shift(); pest.shift(); }
+      labels.push(now);
+      heat.push(Math.random() * 100);
+      drought.push(Math.random() * 100);
+      stress.push(Math.random() * 100);
+      pest.push(Math.random() * 100);
+      chart.update();
+
+      if (heat.at(-1) > 85) showSmartAlert("Heat Stress", "🌤 तापमान बहुत अधिक है!");
+      else if (drought.at(-1) > 85) showSmartAlert("Drought Stress", "💧 पौधों को पानी की आवश्यकता है!");
+      else if (stress.at(-1) > 85) showSmartAlert("Plant Stress", "🌱 पौधों पर तनाव देखा गया!");
+      else if (pest.at(-1) > 85) showSmartAlert("Pest Attack", "🐛 कीट हमला पाया गया!");
     }
-    document.getElementById("chat-send").onclick=async()=>{
-      const i=document.getElementById("chat-input");
-      if(i.value.trim()){await processMessage(i.value.trim());i.value="";}
-    };
-    document.getElementById("chat-voice").onclick=()=>{
-      const recog=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-      recog.lang="hi-IN";recog.start();
-      recog.onresult=async e=>{await processMessage(e.results[0][0].transcript);};
-    };
-    window.addEventListener("load",()=>{
-      const bot=document.getElementById("chatbot");
-      setTimeout(()=>{
-        bot.style.bottom="20px";
-        const greet="नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?";
-        document.getElementById("chat-log").innerHTML=`<div><strong>🤖:</strong> ${greet}</div>`;
-        speakHindi(greet);
-      },1500);
-    });
-    document.getElementById("minimize-btn").onclick=()=>{
-      document.getElementById("chatbot").style.bottom="-400px";
-      setTimeout(()=>document.getElementById("chat-bubble").style.display="block",800);
-    };
-    document.getElementById("chat-bubble").onclick=()=>{
-      document.getElementById("chat-bubble").style.display="none";
-      document.getElementById("chatbot").style.bottom="20px";
-    };
+
+    setInterval(updateChart, 5000);
   </script>
-
-  <script>
-let lastAlertTime = 0;
-const cooldown = 60 * 1000; // 1 minute in milliseconds
-
-// 🗣️ Function to speak message aloud (Hindi)
-function speakAlert(message) {
-  const utterance = new SpeechSynthesisUtterance(message);
-  utterance.lang = "hi-IN";  // Hindi voice
-  utterance.rate = 1;        // normal speed
-  utterance.pitch = 1;       // normal tone
-  speechSynthesis.speak(utterance);
-}
-
-// 🌿 Function to show alert + enforce cooldown
-function showAlert(message) {
-  const now = Date.now();
-  if (now - lastAlertTime < cooldown) {
-    console.log("⏳ Cooldown active — skipping alert");
-    return; // Skip if within cooldown
-  }
-  lastAlertTime = now;
-
-  alert(message + " 🌿 (अगला अलर्ट 1 मिनट बाद आएगा)");
-  speakAlert(message);
-}
-
-// 🌱 Example simulation — replace later with sensor data or AI logic
-function checkPlantStatus() {
-  const waterLevel = Math.random();
-  const pestDetected = Math.random();
-
-  if (waterLevel < 0.3) {
-    showAlert("🚰 पौधों को पानी की आवश्यकता है!");
-  } else if (pestDetected < 0.2) {
-    showAlert("🐛 पौधों पर कीट हमला पाया गया!");
-  }
-}
-
-// ⏲️ Run every 15 seconds
-setInterval(checkPlantStatus, 15000);
-</script>
-  
 </body>
 </html>
-
