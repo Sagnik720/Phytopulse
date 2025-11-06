@@ -13,7 +13,7 @@ app.use(express.json());
 
 // ✅ Folder paths for real plant data
 const WAV_DIR = "/mnt/c/Users/KIIT/Desktop/phytopulse-site/data/wav_files";
-const LABEL_DIR = "/mnt/c/Users/KIIT/Desktop/phytopulse-site/data/emotion_labels";
+const LABEL_DIR = "/mnt/c/Users/KIIT/Desktop/phytopulse-site/data/json_labels";
 
 // ===============================
 // 🧠 Load WAV + Matching Label
@@ -126,3 +126,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ PhytoPulse backend running on port ${PORT}`);
 });
+
