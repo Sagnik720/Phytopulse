@@ -7,13 +7,19 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="phytopulse.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 
   <style>
     html { scroll-behavior: smooth; }
-    body { background-color: #000; color: #e0ffe0; font-family: "Poppins", sans-serif; }
+    body { background-color: #000; color: #e0ffe0; font-family: "Poppins", sans-serif; margin:0; }
     .fade-section { opacity: 0; transform: translateY(40px); transition: opacity 1.2s ease-out, transform 1.2s ease-out; }
     .fade-section.visible { opacity: 1; transform: translateY(0); }
+    .navbar { background: rgba(0,0,0,0.8); padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; position:fixed; width:100%; top:0; z-index:1000; }
+    .navbar img { height:40px; margin-right:10px; vertical-align:middle; }
+    .navbar span { font-size:20px; color:#00ff99; font-weight:bold; }
+    .navbar ul { list-style:none; display:flex; gap:20px; }
+    .navbar a { color:#e0ffe0; text-decoration:none; }
+    section { padding:100px 40px; text-align:center; }
+    footer { text-align:center; padding:20px; background:#000; color:#00ff99; }
   </style>
 
   <script>
@@ -50,23 +56,20 @@
   </header>
 
   <!-- Hero -->
-  <section class="hero">
-    <div class="overlay"></div>
-    <div class="hero-content">
-      <h1>Giving Plants a Voice</h1>
-      <p>Discover how PhytoPulse translates plant bio-signals into insights using AI and neuroscience.</p>
-      <a href="#insights" class="btn">Explore Dashboard</a>
-    </div>
+  <section class="hero" style="padding-top:120px;">
+    <h1>Giving Plants a Voice</h1>
+    <p>Discover how PhytoPulse translates plant bio-signals into insights using AI and neuroscience.</p>
+    <a href="#insights" style="color:#00ff99;">Explore Dashboard</a>
   </section>
 
   <!-- About -->
-  <section id="about" class="about">
+  <section id="about">
     <h2>About PhytoPulse</h2>
     <p>PhytoPulse bridges neuroscience, plant biology, and AI to decode plant communication.</p>
   </section>
 
   <!-- AI Model -->
-  <section id="model" class="model-section">
+  <section id="model">
     <h2>AI Model Development</h2>
     <p>The collected plant bio-signal data trains our machine learning model to detect plant stress early.</p>
   </section>
@@ -86,10 +89,16 @@
   <!-- Benefits -->
   <section id="benefits">
     <h2>Why PhytoPulse?</h2>
-    <div class="benefit-grid">
-      <div class="card"><h3>Early Detection</h3><p>Predict stress before visible damage.</p></div>
-      <div class="card"><h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p></div>
-      <div class="card"><h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p></div>
+    <div class="benefit-grid" style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+      <div class="card" style="background:#0a1a0a;padding:20px;border-radius:10px;width:250px;box-shadow:0 0 15px #00ff99;">
+        <h3>Early Detection</h3><p>Predict stress before visible damage.</p>
+      </div>
+      <div class="card" style="background:#0a1a0a;padding:20px;border-radius:10px;width:250px;box-shadow:0 0 15px #00ff99;">
+        <h3>Eco-Friendly</h3><p>Non-invasive sensing for all crops.</p>
+      </div>
+      <div class="card" style="background:#0a1a0a;padding:20px;border-radius:10px;width:250px;box-shadow:0 0 15px #00ff99;">
+        <h3>Smart Insights</h3><p>Farmers get real-time updates and advice.</p>
+      </div>
     </div>
   </section>
 
@@ -103,7 +112,9 @@
     <div id="plant-data" style="margin:40px;color:#00ff99;"></div>
   </section>
 
-  <!-- JS: Live Data -->
+  <footer><p>© 2025 PhytoPulse</p></footer>
+
+  <!-- Live JS -->
   <script>
     const API_URL = window.location.hostname.includes("localhost")
       ? "http://localhost:5000/api/plant-data"
@@ -114,7 +125,10 @@
     const signalData = [];
     const chart = new Chart(ctx, {
       type: 'line',
-      data: { labels: timeLabels, datasets: [{ label: 'Signal Strength (V)', data: signalData, borderColor: '#00ff99', backgroundColor: 'rgba(0,255,153,0.2)', fill: true, tension: 0.3, pointRadius: 2 }] },
+      data: { labels: timeLabels, datasets: [{
+        label: 'Signal Strength (V)', data: signalData,
+        borderColor: '#00ff99', backgroundColor: 'rgba(0,255,153,0.2)',
+        fill: true, tension: 0.3, pointRadius: 2 }] },
       options: {
         scales: {
           x: { title: { display: true, text: 'Time', color: '#00ff99' }, ticks: { color: '#ccffcc' } },
@@ -124,15 +138,28 @@
       }
     });
 
+    function speakHindi(msg) {
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = "hi-IN";
+      u.rate = 1;
+      speechSynthesis.speak(u);
+    }
+
     let cooldown = 60;
     let lastAlert = "";
+
+    function getVoiceForState(state) {
+      if (state.toLowerCase().includes("pest")) return "चेतावनी! कीट गतिविधि का पता चला है।";
+      if (state.toLowerCase().includes("stress")) return "पौधा तनाव में है, ध्यान दें।";
+      return "आपका पौधा स्वस्थ है।";
+    }
 
     async function fetchPlantData() {
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-
         const now = new Date().toLocaleTimeString();
+
         if (timeLabels.length > 20) { timeLabels.shift(); signalData.shift(); }
         timeLabels.push(now);
         signalData.push(data.signalStrength);
@@ -145,17 +172,29 @@
           <p><strong>Signal Strength:</strong> ${data.signalStrength} V</p>
           <p><strong>Emotion:</strong> ${data.emotion}</p>
           <p><strong>Health:</strong> ${data.healthStatus}</p>
-          <p><em>Updated: ${data.timestamp}</em></p>`;
-      } catch (e) {
-        console.error("Error fetching data:", e);
-      }
+          <p><em>Updated: ${data.timestamp}</em></p>
+          <p id="cooldown-display" style="color:#66ffcc;">⏳ अगली जांच ${cooldown} सेकंड में...</p>`;
+
+        if (cooldown <= 0 && data.alertMessage !== lastAlert) {
+          speakHindi(getVoiceForState(data.predictedState));
+          lastAlert = data.alertMessage;
+          cooldown = 60;
+        }
+
+      } catch (e) { console.error("Error fetching data:", e); }
     }
 
     setInterval(fetchPlantData, 5000);
     fetchPlantData();
-  </script>
 
-  <footer><p>© 2025 PhytoPulse</p></footer>
+    setInterval(() => {
+      if (cooldown > 0) cooldown--;
+      const el = document.getElementById("cooldown-display");
+      if (el) el.textContent = cooldown > 0
+        ? `⏳ अगली जांच ${cooldown} सेकंड में...`
+        : "✅ नई स्थिति जांच के लिए तैयार!";
+    }, 1000);
+  </script>
 
   <!-- Chatbot -->
   <div id="chatbot" style="
@@ -169,7 +208,10 @@
     </div>
     <div id="chat-log" style="max-height:200px;overflow-y:auto;margin:10px 0;font-size:14px;"></div>
     <input id="chat-input" type="text" placeholder="Type in English or Hindi..." style="width:100%;padding:8px;border-radius:8px;border:none;">
-    <button id="chat-send" style="background:#00ff99;border:none;color:#000;padding:6px 10px;margin-top:8px;border-radius:6px;cursor:pointer;">Send</button>
+    <div style="margin-top:8px; display:flex; justify-content:space-between;">
+      <button id="chat-send" style="background:#00ff99;border:none;color:#000;padding:6px 10px;border-radius:6px;cursor:pointer;">Send</button>
+      <button id="chat-voice" style="background:#66ccff;border:none;color:#000;padding:6px 10px;border-radius:6px;cursor:pointer;">🎤 Speak</button>
+    </div>
   </div>
 
   <div id="chat-bubble" style="display:none;position:fixed;bottom:20px;left:20px;background:#00ff99;color:black;
@@ -180,8 +222,11 @@
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        if (data.predictedState === "Normal") return "आपका पौधा बिल्कुल ठीक है 🌿";
-        else return "पौधा हल्के तनाव में है 🌱 — ध्यान रखें।";
+        if (data.predictedState.toLowerCase().includes("stress"))
+          return "पौधा तनाव में है 🌱 — ध्यान रखें।";
+        else if (data.predictedState.toLowerCase().includes("pest"))
+          return "चेतावनी! कीट गतिविधि का पता चला 🐛";
+        else return "आपका पौधा बिल्कुल ठीक है 🌿";
       } catch {
         return "सर्वर से कनेक्शन नहीं हो पा रहा 😔";
       }
@@ -192,8 +237,12 @@
       log.innerHTML += `<div><strong>👨‍🌾:</strong> ${msg}</div>`;
       let reply = "माफ करें, मैं समझ नहीं पाया।";
       const lower = msg.toLowerCase();
-      if (lower.includes("ok") || lower.includes("plant") || lower.includes("कैसा")) reply = await getPlantStatus();
+      if (lower.includes("ok") || lower.includes("fine") || lower.includes("plant") || lower.includes("कैसा"))
+        reply = await getPlantStatus();
+      else if (lower.includes("hello") || lower.includes("नमस्ते"))
+        reply = "नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿";
       log.innerHTML += `<div><strong>🤖:</strong> ${reply}</div>`;
+      speakHindi(reply);
       log.scrollTop = log.scrollHeight;
     }
 
@@ -202,12 +251,24 @@
       if (input.value.trim()) { await processMessage(input.value.trim()); input.value = ""; }
     };
 
+    document.getElementById("chat-voice").onclick = () => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "hi-IN";
+      recognition.start();
+      recognition.onresult = async (event) => {
+        const msg = event.results[0][0].transcript;
+        await processMessage(msg);
+      };
+      recognition.onerror = () => speakHindi("माफ करें, आवाज़ समझ नहीं आई।");
+    };
+
     window.addEventListener("load", () => {
       const bot = document.getElementById("chatbot");
       setTimeout(() => {
         bot.style.bottom = "20px";
-        document.getElementById("chat-log").innerHTML =
-          `<div><strong>🤖:</strong> नमस्ते किसान जी! क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?</div>`;
+        const greeting = "नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?";
+        document.getElementById("chat-log").innerHTML = `<div><strong>🤖:</strong> ${greeting}</div>`;
+        speakHindi(greeting);
       }, 1500);
     });
 
