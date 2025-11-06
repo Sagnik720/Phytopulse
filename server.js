@@ -11,9 +11,33 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Folder paths for real plant data
-const WAV_DIR = "/mnt/c/Users/KIIT/Desktop/phytopulse-site/data/wav_files";
-const LABEL_DIR = "/mnt/c/Users/KIIT/Desktop/phytopulse-site/data/json_labels";
+// ✅ Folder paths (Render-safe)
+const WAV_DIR = path.join(__dirname, "data", "wav_files");
+const LABEL_DIR = path.join(__dirname, "data", "json_labels");
+
+// ===============================
+// 🧠 Safe data loading (handles missing folders)
+// ===============================
+let wavFiles = [];
+let fileIndex = 0;
+let sampleIndex = 0;
+let currentData = [];
+
+try {
+  if (fs.existsSync(WAV_DIR)) {
+    wavFiles = fs.readdirSync(WAV_DIR).filter(f => f.endsWith(".wav"));
+    if (wavFiles.length > 0) {
+      currentData = readWavData(path.join(WAV_DIR, wavFiles[fileIndex]));
+      console.log(`✅ Loaded ${wavFiles.length} WAV files from data folder.`);
+    } else {
+      console.warn("⚠️ No WAV files found — using simulated data.");
+    }
+  } else {
+    console.warn("⚠️ Data folder not found — using simulated data.");
+  }
+} catch (err) {
+  console.warn("⚠️ Error reading WAV files — using simulated data.", err);
+}
 
 // ===============================
 // 🧠 Load WAV + Matching Label
@@ -22,8 +46,7 @@ function readWavData(filePath) {
   const buffer = fs.readFileSync(filePath);
   const decoded = wav.decode.sync(buffer);
   const samples = decoded.channelData[0];
-  const voltages = samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
-  return voltages;
+  return samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
 }
 
 function getMatchingLabel(wavFileName) {
@@ -32,7 +55,6 @@ function getMatchingLabel(wavFileName) {
   if (fs.existsSync(labelFile)) {
     try {
       const content = JSON.parse(fs.readFileSync(labelFile, "utf-8"));
-      // Try to extract the most meaningful label
       return content.emotion || content.state || content.label || "Unknown";
     } catch {
       return "Unknown";
@@ -41,16 +63,28 @@ function getMatchingLabel(wavFileName) {
   return "Unknown";
 }
 
-// Load all available files
-const wavFiles = fs.readdirSync(WAV_DIR).filter(f => f.endsWith(".wav"));
-let fileIndex = 0;
-let sampleIndex = 0;
-let currentData = readWavData(path.join(WAV_DIR, wavFiles[fileIndex]));
-
 // ===============================
-// 🌾 Generate live-like packets
+// 🌾 Generate Live-like Packets
 // ===============================
 function getNextPlantData() {
+  if (currentData.length === 0) {
+    // Simulated fallback data (for Render safety)
+    return {
+      plantId: "PP-SIM-001",
+      signalStrength: (Math.random() * 5).toFixed(2),
+      electricalActivity: (Math.random() * 2).toFixed(3),
+      moisture: (50 + Math.random() * 10).toFixed(1),
+      temperature: (25 + Math.random() * 5).toFixed(1),
+      emotion: "Calm",
+      signalState: "Stable",
+      healthStatus: "Healthy",
+      predictedState: "Normal",
+      emotionLabel: "Simulated",
+      alertMessage: "Simulated data running in Render ☁️",
+      timestamp: new Date().toLocaleTimeString(),
+    };
+  }
+
   const windowSize = 100;
   const chunk = currentData.slice(sampleIndex, sampleIndex + windowSize);
   sampleIndex += windowSize;
@@ -64,11 +98,8 @@ function getNextPlantData() {
   const avgVoltage = chunk.reduce((a, b) => a + b, 0) / chunk.length;
   const moisture = Math.min(100, Math.max(10, avgVoltage * 20 + Math.random() * 10));
   const temperature = (20 + Math.random() * 10).toFixed(1);
-
-  // 🌿 Get true scientific label from dataset
   const emotionLabel = getMatchingLabel(wavFiles[fileIndex]);
 
-  // Convert label → meaningful state
   let predictedState = "Normal";
   let signalState = "Stable";
   let healthStatus = "Healthy";
@@ -111,7 +142,6 @@ function getNextPlantData() {
   };
 }
 
-
 // ===============================
 // 🌿 API ENDPOINTS
 // ===============================
@@ -126,4 +156,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ PhytoPulse backend running on port ${PORT}`);
 });
-
