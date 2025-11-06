@@ -40,14 +40,13 @@ try {
 }
 
 // ===============================
-// 🧠 Load WAV + Matching Label
+// 🧠 WAV Loader + Label Reader
 // ===============================
 function readWavData(filePath) {
   const buffer = fs.readFileSync(filePath);
   const decoded = wav.decode.sync(buffer);
   const samples = decoded.channelData[0];
-  const voltages = samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
-  return voltages;
+  return samples.map(v => Math.min(5, Math.max(0, (v + 1) * 2.5)));
 }
 
 function getMatchingLabel(wavFileName) {
@@ -65,10 +64,10 @@ function getMatchingLabel(wavFileName) {
 }
 
 // ===============================
-// 🌾 Generate live-like packets
+// 🌾 Generate Live-like Data Packets
 // ===============================
 function getNextPlantData() {
-  // 🌿 Fallback if no real data is found
+  // Fallback for missing real data
   if (currentData.length === 0) {
     return {
       plantId: "PP-SIM-001",
@@ -152,18 +151,15 @@ app.get("/api/plant-data", (req, res) => {
 });
 
 // ===============================
-// 🌐 Serve Frontend Files
+// 🌐 Serve Frontend (index.html + assets)
 // ===============================
-app.use(express.static(__dirname)); // Serve all static files (index.html, css, etc.)
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+app.use(express.static(__dirname));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 // ===============================
-// 🚀 RUN SERVER (Render Compatible)
+// 🚀 Render-Compatible Server
 // ===============================
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ PhytoPulse backend running on port ${PORT}`);
 });
