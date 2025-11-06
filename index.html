@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>PhytoPulse — Plant Emotion Network</title>
   <link rel="icon" href="phytopulse.png" />
+  <!-- Chart.js (loaded from CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -36,7 +37,7 @@
     .hero::before{
       content:"";position:absolute;inset:0;
       background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
-      z-index:0;pointer-events:none; /* allow clicks through overlay */
+      z-index:0;pointer-events:none;
     }
     .hero-inner{position:relative;z-index:2;max-width:980px;padding:32px 20px}
     .hero h1{font-size:48px;color:#00ff99;margin:0 0 12px;text-shadow:0 8px 30px rgba(0,255,153,0.12);filter:drop-shadow(0 0 18px rgba(0,255,153,0.18))}
@@ -194,318 +195,354 @@
   </div>
 
   <script>
-  /* ============================
-     Config, helpers, and UI init
-     ============================ */
-  const API_URL = null; // set your endpoint (e.g. "https://yourdomain.com/api/plant-data") or keep `null` for simulation
+  (function(){
+    /* ========== Configuration ========== */
+    const API_URL = "https://phytopulse-org.onrender.com/api/plant-data"; // your live endpoint
+    const USE_SIM_ON_FAIL = true; // silently switch to simulation if API fails
+    let useSimulation = false;
 
-  function playBeep(){
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type='sine'; o.frequency.value = 880;
-      g.gain.value = 0.0001;
-      o.connect(g); g.connect(ctx.destination);
-      const now = ctx.currentTime;
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.02, now + 0.01);
-      o.start(now);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-      o.stop(now + 0.2);
-      setTimeout(()=>{ try{ ctx.close(); } catch(e){} }, 400);
-    }catch(e){ console.warn('beep unsupported', e); }
-  }
-
-  function speakHindi(text){
-    try{
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'hi-IN'; u.rate = 1; u.pitch = 1;
-      speechSynthesis.speak(u);
-    }catch(e){ console.warn('speech unsupported', e); }
-  }
-
-  /* IntersectionObserver for sections & staggered children */
-  const sectionObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        e.target.classList.add('visible');
-        if(e.target.classList.contains('stagger')) e.target.classList.add('visible');
-      } else {
-        // remove class to allow re-animation when re-entering
-        e.target.classList.remove('visible');
-        if(e.target.classList.contains('stagger')) e.target.classList.remove('visible');
-      }
-    });
-  }, { threshold: 0.22 });
-
-  document.querySelectorAll('[data-section]').forEach(s=> sectionObserver.observe(s));
-
-  /* ============================
-     Chart (multi-line) setup
-     ============================ */
-  const ctx = document.getElementById('plantChart').getContext('2d');
-  const labels = [], heat = [], drought = [], stress = [], pest = [];
-
-  const plantChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Heat Stress', data: heat, borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.12)', tension: 0.28, pointRadius: 3, fill: true },
-        { label: 'Drought Stress', data: drought, borderColor: '#ffb86b', backgroundColor: 'rgba(255,184,107,0.10)', tension: 0.28, pointRadius: 3, fill: true },
-        { label: 'General Stress', data: stress, borderColor: '#00ff99', backgroundColor: 'rgba(0,255,153,0.08)', tension: 0.28, pointRadius: 3, fill: true },
-        { label: 'Pest Activity', data: pest, borderColor: '#66ccff', backgroundColor: 'rgba(102,204,255,0.08)', tension: 0.28, pointRadius: 3, fill: true }
-      ]
-    },
-    options: {
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        x:{ ticks:{ color:'#caffd6' }, grid:{ color:'rgba(0,255,153,0.02)' } },
-        y:{ min:0, max:100, ticks:{ color:'#caffd6' }, grid:{ color:'rgba(0,255,153,0.02)' } }
-      },
-      plugins:{ legend:{ labels:{ color:'#caffd6' } } }
-    }
-  });
-
-  /* ============================
-     Toast + cooldown logic
-     ============================ */
-  const toast = document.getElementById('toast');
-  const toastTitle = document.getElementById('toast-title');
-  const toastMessage = document.getElementById('toast-message');
-  const toastCooldown = document.getElementById('toast-cooldown');
-  const toastActionBtn = document.getElementById('toast-action');
-
-  let lastAlertTime = 0;
-  const COOLDOWN_MS = 60 * 1000;
-  let cooldownIntervalId = null;
-
-  function formatSeconds(ms){
-    return `${Math.ceil(ms/1000)}s`;
-  }
-
-  function showToast(state, message){
-    const now = Date.now();
-    if(now - lastAlertTime < COOLDOWN_MS){
-      console.log('Cooldown active — skipping toast');
-      return;
-    }
-    lastAlertTime = now;
-
-    toastTitle.textContent = `🚨 ${state}`;
-    toastMessage.innerHTML = message;
-    toastCooldown.textContent = `Next alert in ${formatSeconds(COOLDOWN_MS)}`;
-
-    let actionText = "निगरानी जारी रखें";
-    if(/drought|stress/i.test(state)) actionText = "💧 पानी दें";
-    else if(/heat/i.test(state)) actionText = "🌤 छाया दें";
-    else if(/pest/i.test(state)) actionText = "🐛 कीटनाशक";
-
-    toastActionBtn.textContent = actionText;
-
-    // beep + voice
-    playBeep();
-    setTimeout(()=> speakHindi(`${message} ${actionText}`), 250);
-
-    // show toast
-    toast.style.display = 'flex';
-    setTimeout(()=> toast.classList.add('show'), 20);
-
-    // cooldown countdown UI
-    if(cooldownIntervalId) clearInterval(cooldownIntervalId);
-    let remaining = COOLDOWN_MS;
-    cooldownIntervalId = setInterval(()=>{
-      remaining -= 1000;
-      if(remaining <= 0){
-        toastCooldown.textContent = `Next alert in 0s`;
-        clearInterval(cooldownIntervalId);
-        cooldownIntervalId = null;
-      } else {
-        toastCooldown.textContent = `Next alert in ${formatSeconds(remaining)}`;
-      }
-    }, 1000);
-
-    // auto hide visually after 7s, but cooldown still enforced
-    setTimeout(()=>{
-      toast.classList.remove('show');
-      setTimeout(()=> toast.style.display='none', 420);
-    }, 7000);
-  }
-
-  toastActionBtn.addEventListener('click', ()=> speakHindi(toastActionBtn.textContent));
-
-  /* ============================
-     Live update loop (simulate or fetch)
-     ============================ */
-  async function fetchFromAPI(){
-    if(!API_URL) return null;
-    try{
-      const r = await fetch(API_URL);
-      if(!r.ok) return null;
-      return await r.json();
-    }catch(e){ console.warn('api fetch failed', e); return null; }
-  }
-
-  let lastAlertMessage = '';
-
-  async function updateLoop(){
-    const apiData = await fetchFromAPI();
-    let data;
-    if(apiData){
-      data = {
-        moisture: apiData.moisture ?? (Math.random()*100).toFixed(1),
-        temperature: apiData.temperature ?? (20 + Math.random()*10).toFixed(1),
-        signalStrength: apiData.signalStrength ?? (Math.random()*5).toFixed(2),
-        emotion: apiData.emotion ?? 'Calm',
-        predictedState: apiData.predictedState ?? 'Normal',
-        alertMessage: apiData.alertMessage ?? ''
-      };
-    } else {
-      const H = Math.random()*100, D = Math.random()*100, S = Math.random()*100, P = Math.random()*100;
-      data = {
-        moisture: (40 + Math.random()*40).toFixed(1),
-        temperature: (18 + Math.random()*10).toFixed(1),
-        signalStrength: (2 + Math.random()*1.6).toFixed(2),
-        emotion: ['Calm','Alert','Stressed'][Math.floor(Math.random()*3)],
-        predictedState: (P>90) ? 'Pest' : (H>88 ? 'Heat' : (D>88 ? 'Drought' : (S>88 ? 'Stress' : 'Normal'))),
-        alertMessage: ''
-      };
-      if(data.predictedState === 'Pest') data.alertMessage = 'कीट सक्रियता उच्च स्तर पर है!';
-      if(data.predictedState === 'Heat') data.alertMessage = 'तापमान बहुत उच्च है!';
-      if(data.predictedState === 'Drought') data.alertMessage = 'मिट्टी नमी बहुत कम है!';
-      if(data.predictedState === 'Stress') data.alertMessage = 'पौधे पर तनाव संकेत मिले हैं!';
+    /* ========== Helpers ========== */
+    function safe(fn, fallback){
+      try{ return fn(); }catch(e){ console.warn('safe error', e); if(typeof fallback==='function') return fallback(); return null; }
     }
 
-    // push to chart
-    const nowLabel = new Date().toLocaleTimeString();
-    if(labels.length > 18){ labels.shift(); heat.shift(); drought.shift(); stress.shift(); pest.shift(); }
-    labels.push(nowLabel);
-
-    if(apiData){
-      heat.push(Math.min(100, (apiData.temperature ?? 25) / 40 * 100));
-      drought.push(Math.min(100, (100 - (apiData.moisture ?? 50))));
-      stress.push(Math.min(100, (apiData.signalStrength ?? 2.5) / 5 * 100));
-      pest.push(apiData.pestScore ?? 0);
-    } else {
-      heat.push(Math.random()*100);
-      drought.push(Math.random()*100);
-      stress.push(Math.random()*100);
-      pest.push(Math.random()*100);
-    }
-    plantChart.update();
-
-    // update live data text
-    const plantDataEl = document.getElementById('plant-data');
-    plantDataEl.innerHTML = `
-      <div>🌿 Live Plant Data</div>
-      <div style="margin-top:8px">
-        Moisture: <strong>${data.moisture}%</strong> · Temp: <strong>${data.temperature}°C</strong><br/>
-        Signal: <strong>${data.signalStrength}V</strong> · Emotion: <strong>${data.emotion}</strong><br/>
-        <small>Last updated: ${new Date().toLocaleTimeString()}</small>
-      </div>
-    `;
-
-    // show toast if abnormal and not recently alerted
-    if(data.predictedState && data.predictedState !== 'Normal' && data.alertMessage !== lastAlertMessage){
-      const stateLabel = data.predictedState;
-      const msg = data.alertMessage || `${stateLabel} detected`;
-      lastAlertMessage = data.alertMessage;
-      showToast(stateLabel, msg);
-    }
-  }
-
-  // start loop
-  updateLoop();
-  setInterval(updateLoop, 5000);
-
-  /* ============================
-     Chatbot UI & logic
-     ============================ */
-  const chatBubble = document.getElementById('chat-bubble');
-  const chatBox = document.getElementById('chatbot');
-  const minimizeBtn = document.getElementById('minimize-btn');
-  const chatLog = document.getElementById('chat-log');
-  const chatInput = document.getElementById('chat-input');
-  const chatSend = document.getElementById('chat-send');
-  const chatVoice = document.getElementById('chat-voice');
-
-  chatBubble.addEventListener('click', ()=>{
-    chatBubble.style.display = 'none';
-    chatBox.style.bottom = '20px';
-    chatBox.setAttribute('aria-hidden','false');
-  });
-  minimizeBtn.addEventListener('click', ()=>{
-    chatBox.style.bottom = '-420px';
-    chatBox.setAttribute('aria-hidden','true');
-    setTimeout(()=> chatBubble.style.display = 'flex', 520);
-  });
-
-  async function getPlantStatusShort(){
-    if(API_URL){
+    function playBeep(){
       try{
-        const r = await fetch(API_URL);
-        if(r.ok){ const d = await r.json(); return (d.predictedState==='Normal' ? 'आपका पौधा ठीक है 🌿' : `चेतावनी: ${d.predictedState}`); }
-      }catch(_){}
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type='sine'; o.frequency.value = 880;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.02, now + 0.01);
+        o.start(now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        o.stop(now + 0.2);
+        setTimeout(()=>{ try{ ctx.close(); } catch(e){} }, 400);
+      }catch(e){ console.warn('beep unsupported', e); }
     }
-    return 'सर्वर से कनेक्शन नहीं हो पा रहा — (Simulated) आपका पौधा सामान्य है 🌿';
-  }
 
-  async function processMessage(msg){
-    chatLog.innerHTML += `<div><strong>👨‍🌾:</strong> ${msg}</div>`;
-    let reply = "माफ करें, मुझे समझ नहीं आया।";
-    const l = msg.toLowerCase();
-    if(l.includes('कैसा') || l.includes('plant') || l.includes('कैसा है')) {
-      reply = await getPlantStatusShort();
-    } else if(l.includes('नमस्ते') || l.includes('hi') || l.includes('hello')) {
-      reply = 'नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿';
+    function speakHindi(text){
+      try{
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'hi-IN'; u.rate = 1; u.pitch = 1;
+        speechSynthesis.speak(u);
+      }catch(e){ console.warn('speech unsupported', e); }
     }
-    chatLog.innerHTML += `<div style="margin-bottom:6px"><strong>🤖:</strong> ${reply}</div>`;
-    chatLog.scrollTop = chatLog.scrollHeight;
-    speakHindi(reply);
-  }
 
-  chatSend.addEventListener('click', async ()=> {
-    const v = chatInput.value.trim(); if(!v) return; await processMessage(v); chatInput.value = '';
-  });
-  chatInput.addEventListener('keydown', (e)=> { if(e.key==='Enter') chatSend.click(); });
-  chatVoice.addEventListener('click', ()=>{
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SR){ alert('Voice recognition not supported in this browser'); return; }
-    const recog = new SR();
-    recog.lang = 'hi-IN';
-    recog.start();
-    recog.onresult = async (ev) => {
-      const text = ev.results[0][0].transcript;
-      chatInput.value = text; await processMessage(text);
-    };
-    recog.onerror = (err)=> console.warn('recog error', err);
-  });
+    /* ========== IntersectionObserver (animations) ========== */
+    const sectionObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('visible');
+          if(e.target.classList.contains('stagger')) e.target.classList.add('visible');
+        } else {
+          e.target.classList.remove('visible');
+          if(e.target.classList.contains('stagger')) e.target.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0.22 });
 
-  /* ============================
-     Init: initial chart fill and greeting
-     ============================ */
-  window.addEventListener('load', ()=>{
-    for(let i=0;i<8;i++){
-      labels.push(new Date(Date.now() - (8-i)*5000).toLocaleTimeString());
-      heat.push(20 + Math.random()*20);
-      drought.push(10 + Math.random()*30);
-      stress.push(10 + Math.random()*30);
-      pest.push(Math.random()*20);
+    document.querySelectorAll('[data-section]').forEach(s=> sectionObserver.observe(s));
+
+    /* ========== Chart setup (guarded) ========== */
+    let plantChart = null;
+    const labels = [], heat = [], drought = [], stress = [], pest = [];
+    const canvas = document.getElementById('plantChart');
+
+    function initChartSafely(){
+      if(!canvas) { console.warn('canvas not found'); return; }
+      try{
+        const ctx = canvas.getContext('2d');
+        plantChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Heat Stress', data: heat, borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.12)', tension: 0.28, pointRadius: 3, fill: true },
+              { label: 'Drought Stress', data: drought, borderColor: '#ffb86b', backgroundColor: 'rgba(255,184,107,0.10)', tension: 0.28, pointRadius: 3, fill: true },
+              { label: 'General Stress', data: stress, borderColor: '#00ff99', backgroundColor: 'rgba(0,255,153,0.08)', tension: 0.28, pointRadius: 3, fill: true },
+              { label: 'Pest Activity', data: pest, borderColor: '#66ccff', backgroundColor: 'rgba(102,204,255,0.08)', tension: 0.28, pointRadius: 3, fill: true }
+            ]
+          },
+          options: {
+            responsive:true,
+            maintainAspectRatio:false,
+            scales:{
+              x:{ ticks:{ color:'#caffd6' }, grid:{ color:'rgba(0,255,153,0.02)' } },
+              y:{ min:0, max:100, ticks:{ color:'#caffd6' }, grid:{ color:'rgba(0,255,153,0.02)' } }
+            },
+            plugins:{ legend:{ labels:{ color:'#caffd6' } } }
+          }
+        });
+      }catch(e){
+        console.warn('Chart init failed', e);
+        plantChart = null;
+      }
     }
-    plantChart.update();
 
-    setTimeout(()=> {
-      chatLog.innerHTML = `<div><strong>🤖:</strong> नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?</div>`;
-      speakHindi('नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ। क्या आप जानना चाहेंगे कि आपका पौधा कैसा है?');
-    }, 900);
+    /* ========== Toast + cooldown ========== */
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    const toastCooldown = document.getElementById('toast-cooldown');
+    const toastActionBtn = document.getElementById('toast-action');
 
-    // subtle welcome toast (non-intrusive)
-    setTimeout(()=> {
-      showToast('Welcome','PhytoPulse सक्रिय है — अलर्ट और आवाज़ सक्षम हैं।');
-    }, 1400);
-  });
+    let lastAlertTime = 0;
+    const COOLDOWN_MS = 60 * 1000;
+    let cooldownIntervalId = null;
+
+    function formatSeconds(ms){ return `${Math.ceil(ms/1000)}s`; }
+
+    function showToast(state, message){
+      const now = Date.now();
+      if(now - lastAlertTime < COOLDOWN_MS){
+        console.log('Cooldown active — skipping toast');
+        return;
+      }
+      lastAlertTime = now;
+
+      toastTitle.textContent = `🚨 ${state}`;
+      toastMessage.innerHTML = message;
+      toastCooldown.textContent = `Next alert in ${formatSeconds(COOLDOWN_MS)}`;
+
+      let actionText = "निगरानी जारी रखें";
+      if(/drought|stress/i.test(state)) actionText = "💧 पानी दें";
+      else if(/heat/i.test(state)) actionText = "🌤 छाया दें";
+      else if(/pest/i.test(state)) actionText = "🐛 कीटनाशक";
+
+      toastActionBtn.textContent = actionText;
+
+      // beep + voice
+      playBeep();
+      setTimeout(()=> speakHindi(`${message} ${actionText}`), 250);
+
+      // show toast
+      toast.style.display = 'flex';
+      setTimeout(()=> toast.classList.add('show'), 20);
+
+      // cooldown timer UI
+      if(cooldownIntervalId) clearInterval(cooldownIntervalId);
+      let remaining = COOLDOWN_MS;
+      cooldownIntervalId = setInterval(()=>{
+        remaining -= 1000;
+        if(remaining <= 0){
+          toastCooldown.textContent = `Next alert in 0s`;
+          clearInterval(cooldownIntervalId); cooldownIntervalId = null;
+        } else {
+          toastCooldown.textContent = `Next alert in ${formatSeconds(remaining)}`;
+        }
+      }, 1000);
+
+      // hide visually after 7s (cooldown still enforced)
+      setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>{ toast.style.display='none' },420); }, 7000);
+    }
+    toastActionBtn.addEventListener('click', ()=> speakHindi(toastActionBtn.textContent));
+
+    /* ========== Fetch with timeout ========== */
+    async function fetchWithTimeout(url, ms=3000){
+      try{
+        const controller = new AbortController();
+        const id = setTimeout(()=>controller.abort(), ms);
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(id);
+        if(!res.ok) throw new Error('bad response');
+        const json = await res.json();
+        return json;
+      }catch(e){ console.warn('fetchWithTimeout failed', e); return null; }
+    }
+
+    /* ========== Live update loop (API preferred, silent fallback) ========== */
+    let lastAlertMessage = '';
+    async function updateLoop(){
+      // Attempt to fetch API if not in simulation mode
+      let apiData = null;
+      if(!useSimulation && API_URL){
+        apiData = await fetchWithTimeout(API_URL, 3500);
+        if(!apiData && USE_SIM_ON_FAIL){
+          // silently switch to simulation mode
+          useSimulation = true;
+          console.info('API unreachable — silently switching to simulation mode');
+        }
+      }
+
+      let data;
+      if(apiData){
+        // Map API data to our internal fields (tolerant)
+        data = {
+          moisture: apiData.moisture ?? (Math.random()*100).toFixed(1),
+          temperature: apiData.temperature ?? (20 + Math.random()*10).toFixed(1),
+          signalStrength: apiData.signalStrength ?? (Math.random()*5).toFixed(2),
+          emotion: apiData.emotion ?? 'Calm',
+          predictedState: apiData.predictedState ?? 'Normal',
+          alertMessage: apiData.alertMessage ?? ''
+        };
+      } else {
+        // Simulation mode
+        const H = Math.random()*100, D = Math.random()*100, S = Math.random()*100, P = Math.random()*100;
+        data = {
+          moisture: (40 + Math.random()*40).toFixed(1),
+          temperature: (18 + Math.random()*10).toFixed(1),
+          signalStrength: (2 + Math.random()*1.6).toFixed(2),
+          emotion: ['Calm','Alert','Stressed'][Math.floor(Math.random()*3)],
+          predictedState: (P>90) ? 'Pest' : (H>88 ? 'Heat' : (D>88 ? 'Drought' : (S>88 ? 'Stress' : 'Normal'))),
+          alertMessage: ''
+        };
+        if(data.predictedState === 'Pest') data.alertMessage = 'कीट सक्रियता उच्च स्तर पर है!';
+        if(data.predictedState === 'Heat') data.alertMessage = 'तापमान बहुत उच्च है!';
+        if(data.predictedState === 'Drought') data.alertMessage = 'मिट्टी नमी बहुत कम है!';
+        if(data.predictedState === 'Stress') data.alertMessage = 'पौधे पर तनाव संकेत मिले हैं!';
+      }
+
+      // Ensure chart exists
+      if(!plantChart) initChartSafely();
+
+      // push data to chart arrays
+      const nowLabel = new Date().toLocaleTimeString();
+      if(labels.length > 18){ labels.shift(); heat.shift(); drought.shift(); stress.shift(); pest.shift(); }
+      labels.push(nowLabel);
+
+      if(apiData){
+        heat.push(Math.min(100, (apiData.temperature ?? 25) / 40 * 100));
+        drought.push(Math.min(100, (100 - (apiData.moisture ?? 50))));
+        stress.push(Math.min(100, (apiData.signalStrength ?? 2.5) / 5 * 100));
+        pest.push(apiData.pestScore ?? 0);
+      } else {
+        heat.push(Math.random()*100);
+        drought.push(Math.random()*100);
+        stress.push(Math.random()*100);
+        pest.push(Math.random()*100);
+      }
+
+      if(plantChart) {
+        try{ plantChart.update(); }catch(e){ console.warn('chart update failed', e); }
+      }
+
+      // update live-data text area
+      const plantDataEl = document.getElementById('plant-data');
+      if(plantDataEl){
+        plantDataEl.innerHTML = `
+          <div>🌿 Live Plant Data</div>
+          <div style="margin-top:8px">
+            Moisture: <strong>${data.moisture}%</strong> · Temp: <strong>${data.temperature}°C</strong><br/>
+            Signal: <strong>${data.signalStrength}V</strong> · Emotion: <strong>${data.emotion}</strong><br/>
+            <small>Last updated: ${new Date().toLocaleTimeString()}</small>
+          </div>
+        `;
+      }
+
+      // trigger toast alert only if abnormal and not same as last alert
+      if(data.predictedState && data.predictedState !== 'Normal' && data.alertMessage !== lastAlertMessage){
+        const stateLabel = data.predictedState;
+        const msg = data.alertMessage || `${stateLabel} detected`;
+        lastAlertMessage = data.alertMessage;
+        // showToast will enforce its own cooldown
+        showToast(stateLabel, msg);
+      }
+    }
+
+    /* ========== Chatbot UI & logic ========== */
+    function initChatbot(){
+      const chatBubble = document.getElementById('chat-bubble');
+      const chatBox = document.getElementById('chatbot');
+      const minimizeBtn = document.getElementById('minimize-btn');
+      const chatLog = document.getElementById('chat-log');
+      const chatInput = document.getElementById('chat-input');
+      const chatSend = document.getElementById('chat-send');
+      const chatVoice = document.getElementById('chat-voice');
+
+      if(chatBubble){
+        chatBubble.addEventListener('click', ()=>{
+          chatBubble.style.display = 'none';
+          chatBox.style.bottom = '20px';
+          chatBox.setAttribute('aria-hidden','false');
+        });
+      }
+      if(minimizeBtn){
+        minimizeBtn.addEventListener('click', ()=>{
+          chatBox.style.bottom = '-420px';
+          chatBox.setAttribute('aria-hidden','true');
+          setTimeout(()=> chatBubble.style.display = 'flex', 520);
+        });
+      }
+
+      async function getPlantStatusShort(){
+        if(!useSimulation && API_URL){
+          const r = await fetchWithTimeout(API_URL, 3000);
+          if(r && r.predictedState) return (r.predictedState === 'Normal' ? 'आपका पौधा ठीक है 🌿' : `चेतावनी: ${r.predictedState}`);
+        }
+        return 'सर्वर से कनेक्शन नहीं हो पा रहा — (Simulated) आपका पौधा सामान्य है 🌿';
+      }
+
+      async function processMessage(msg){
+        if(!chatLog) return;
+        chatLog.innerHTML += `<div><strong>👨‍🌾:</strong> ${msg}</div>`;
+        let reply = "माफ करें, मुझे समझ नहीं आया।";
+        const l = msg.toLowerCase();
+        if(l.includes('कैसा') || l.includes('plant') || l.includes('कैसा है')) {
+          reply = await getPlantStatusShort();
+        } else if(l.includes('नमस्ते') || l.includes('hi') || l.includes('hello')) {
+          reply = 'नमस्ते किसान जी! मैं PhytoPulse चैट सहायक हूँ 🌿';
+        }
+        chatLog.innerHTML += `<div style="margin-bottom:6px"><strong>🤖:</strong> ${reply}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+        speakHindi(reply);
+      }
+
+      if(chatSend){
+        chatSend.addEventListener('click', async ()=> {
+          const v = chatInput.value.trim(); if(!v) return; await processMessage(v); chatInput.value = '';
+        });
+      }
+      if(chatInput){
+        chatInput.addEventListener('keydown', (e)=> { if(e.key==='Enter') chatSend.click(); });
+      }
+      if(chatVoice){
+        chatVoice.addEventListener('click', ()=>{
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if(!SR){ alert('Voice recognition not supported in this browser'); return; }
+          const recog = new SR();
+          recog.lang = 'hi-IN';
+          recog.start();
+          recog.onresult = async (ev) => {
+            const text = ev.results[0][0].transcript;
+            chatInput.value = text; await processMessage(text);
+          };
+          recog.onerror = (err)=> console.warn('recog error', err);
+        });
+      }
+    }
+
+    /* ========== Initialization ========== */
+    window.addEventListener('load', ()=>{
+      // init chart and chatbot safely
+      initChartSafely();
+      initChatbot();
+
+      // pre-fill chart for nicer first render
+      for(let i=0;i<8;i++){
+        labels.push(new Date(Date.now() - (8-i)*5000).toLocaleTimeString());
+        heat.push(20 + Math.random()*20);
+        drought.push(10 + Math.random()*30);
+        stress.push(10 + Math.random()*30);
+        pest.push(Math.random()*20);
+      }
+      if(plantChart) plantChart.update();
+
+      // greeting
+      setTimeout(()=> {
+        const chatLog = document.getElementById('chat-log');
+        if(chatLog) chatLog.innerHTML = `<div><strong>🤖:</strong> नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ 🌿 क्या आप जानना चाहते हैं कि आपका पौधा कैसा है?</div>`;
+        speakHindi('नमस्ते किसान जी! मैं आपका PhytoPulse सहायक हूँ। क्या आप जानना चाहेंगे कि आपका पौधा कैसा है?');
+      }, 900);
+
+      // start loop (uses API when available, else simulation silently)
+      updateLoop();
+      setInterval(updateLoop, 5000);
+    });
+  })();
   </script>
 </body>
 </html>
